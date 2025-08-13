@@ -1,11 +1,11 @@
 // electron/database/scoutItemRepository.cjs
-const db = require('./connection.cjs');
+const {getDb} = require('./connection.cjs');
 
 function getItemsByScoutId(scoutId) {
-    const items = db.prepare('SELECT * FROM scout_items WHERE scout_id = ?').all(scoutId);
+    const items = getDb.prepare('SELECT * FROM scout_items WHERE scout_id = ?').all(scoutId);
 
     // Para cada item, buscamos suas categorias e sub-categorias
-    const categoryStmt = db.prepare('SELECT * FROM categories WHERE item_id = ? AND type = ?');
+    const categoryStmt = getDb.prepare('SELECT * FROM categories WHERE item_id = ? AND type = ?');
 
     return items.map(item => ({
         ...item,

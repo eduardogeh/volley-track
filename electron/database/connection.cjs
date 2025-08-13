@@ -1,22 +1,42 @@
-const path = require('path');
+// electron/database/connection.cjs
 const Database = require('better-sqlite3');
-
-// Resolve the path to the database file.
-// Using __dirname ensures the path is correct relative to the script's location.
-const isProd = process.env.NODE_ENV === 'production';
-
-const dbPath = isProd
-    ? path.join(process.resourcesPath, 'volei_manager.sqlite')
-    : path.resolve(__dirname, 'volei_manager.sqlite');
-
-// Initialize the database connection.
-// The 'verbose' option will log all executed SQL statements to the console.
-const db = new Database(dbPath, { verbose: console.log });
+let db; // A variável da conexão fica aqui, mas não é inicializada ainda.
 
 /**
- * Sets up the database schema by creating all necessary tables if they don't already exist.
+ * Inicializa a conexão com o banco de dados.
+ * Esta função será chamada pelo main.cjs DEPOIS de descobrir o caminho correto.
+ * @param {string} dbPath - O caminho completo para o arquivo do banco de dados.
  */
-function setupDatabase() {
+function initDatabase(dbPath) {
+    if (!db) {
+        try {
+            db = new Database(dbPath, { verbose: console.log });
+            setupSchema(); // Roda a configuração do schema depois de conectar
+            console.log('Conexão com o banco de dados estabelecida com sucesso.');
+        } catch (error) {
+            console.error('Falha ao conectar ao banco de dados:', error);
+            throw error;
+        }
+    }
+    return db;
+}
+
+/**
+ * Retorna a instância do banco de dados já conectada.
+ * Os repositórios usarão esta função.
+ */
+function getDb() {
+    if (!db) {
+        throw new Error('A conexão com o banco de dados não foi inicializada.');
+    }
+    return db;
+}
+
+/**
+ * Cria as tabelas se elas não existirem.
+ * Movido para uma função separada para ser chamada após a conexão.
+ */
+function setupSchema() {
     db.exec(`
         CREATE TABLE IF NOT EXISTS teams (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,11 +81,8 @@ function setupDatabase() {
             FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
         );
     `);
-    console.log('Banco de dados configurado com sucesso.');
+    console.log('Schema do banco de dados verificado/configurado.');
 }
 
-// Run the setup function immediately when the script is loaded.
-setupDatabase();
-
-// Export the database connection for use in other parts of the application.
-module.exports = db;
+// Em vez de exportar 'db', exportamos as funções de gerenciamento.
+module.exports = { initDatabase, getDb };

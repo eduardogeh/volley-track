@@ -1,12 +1,12 @@
-const db = require('./connection.cjs');
+const {getDb} = require('./connection.cjs');
 
 const playerRepository = {
     create(player) {
         // Calcula a próxima posição na ordem
-        const orderResult = db.prepare('SELECT COUNT(*) as count FROM players WHERE team_id = ?').get(player.team_id);
+        const orderResult = getDb.prepare('SELECT COUNT(*) as count FROM players WHERE team_id = ?').get(player.team_id);
         const nextOrder = orderResult.count;
 
-        const stmt = db.prepare(`
+        const stmt = getDb.prepare(`
             INSERT INTO players (name, number, height, position, team_id, player_order, photo)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `);
@@ -16,14 +16,14 @@ const playerRepository = {
 
     getByTeamId(teamId) {
         // A ordenação é a responsabilidade desta função
-        return db.prepare('SELECT * FROM players WHERE team_id = ? ORDER BY player_order ASC').all(teamId);
+        return getDb.prepare('SELECT * FROM players WHERE team_id = ? ORDER BY player_order ASC').all(teamId);
     },
 
     // Função robusta para atualizar a ordem de uma lista inteira de jogadores
     updateOrder(teamId, orderedPlayerIds) {
-        const updateStmt = db.prepare('UPDATE players SET player_order = ? WHERE id = ? AND team_id = ?');
+        const updateStmt = getDb.prepare('UPDATE players SET player_order = ? WHERE id = ? AND team_id = ?');
 
-        const transaction = db.transaction(() => {
+        const transaction = getDb.transaction(() => {
             for (let i = 0; i < orderedPlayerIds.length; i++) {
                 const playerId = orderedPlayerIds[i];
                 const newOrder = i;
@@ -35,21 +35,21 @@ const playerRepository = {
     },
 
     update(player) {
-        const stmt = db.prepare('UPDATE players SET name = ?, number = ?, height = ?, position = ? WHERE id = ?');
+        const stmt = getDb.prepare('UPDATE players SET name = ?, number = ?, height = ?, position = ? WHERE id = ?');
         stmt.run(player.name, player.number, player.height, player.position, player.id);
     },
 
     delete(id) {
         // Primeiro, pegamos o time e a ordem do jogador que será deletado
-        const playerToDelete = db.prepare('SELECT team_id, player_order FROM players WHERE id = ?').get(id);
+        const playerToDelete = getDb.prepare('SELECT team_id, player_order FROM players WHERE id = ?').get(id);
         if (!playerToDelete) return; // Jogador não existe
 
-        const transaction = db.transaction(() => {
+        const transaction = getDb.transaction(() => {
             // Deleta o jogador
-            db.prepare('DELETE FROM players WHERE id = ?').run(id);
+            getDb.prepare('DELETE FROM players WHERE id = ?').run(id);
 
             // Atualiza a ordem de todos os jogadores que vinham depois dele no mesmo time
-            const updateStmt = db.prepare(`
+            const updateStmt = getDb.prepare(`
                 UPDATE players
                 SET player_order = player_order - 1
                 WHERE team_id = ? AND player_order > ?
