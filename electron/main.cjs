@@ -1,13 +1,14 @@
-// electron/main.cjs
-const { app, BrowserWindow, ipcMain } = require('electron'); // -> NOVO: importado ipcMain
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
-// -> NOVO: Importe os repositórios que contêm a lógica do banco de dados
+// Importa a função de inicialização do banco
+const { initDatabase } = require('./database/connection.cjs');
+
+// Importa os repositórios
 const teamRepository = require('./database/teamRepository.cjs');
 const playerRepository = require('./database/playerRepository.cjs');
 const scoutRepository = require('./database/scoutRepository.cjs');
 const scoutItemRepository = require('./database/scoutItemRepository.cjs');
-
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -15,8 +16,6 @@ function createWindow() {
         height: 720,
         webPreferences: {
             preload: path.join(__dirname, 'preload.cjs'),
-            // -> NOVO: Garanta que o sandbox esteja ativado para segurança
-            // Esta é a razão pela qual precisamos usar IPC.
             sandbox: true,
             contextIsolation: true,
         },
@@ -30,66 +29,40 @@ function createWindow() {
     }
 }
 
-// -> NOVO: Bloco inteiro de handlers da API via IPC
-// O processo principal escuta por "invocações" do script de preload
-// e executa a função correspondente do repositório.
-// -------------------------------------------------------------------
+// ------------------ IPC ------------------
+// (seus handlers continuam iguais)
+ipcMain.handle('teams:getAll', () => teamRepository.getAll());
+ipcMain.handle('teams:update', (event, team) => teamRepository.update(team));
+ipcMain.handle('teams:create', (event, team) => teamRepository.create(team));
+ipcMain.handle('teams:delete', (event, teamId) => teamRepository.delete(teamId));
 
-// API para Times
-ipcMain.handle('teams:getAll', () => {
-    return teamRepository.getAll();
-});
-ipcMain.handle('teams:update', (event, team) => {
-    teamRepository.update(team);
-});
-ipcMain.handle('teams:create', (event, team) => {
-    return teamRepository.create(team);
-});
-ipcMain.handle('teams:delete', (event, teamId) => {
-    teamRepository.delete(teamId);
-});
+ipcMain.handle('players:getByTeamId', (event, teamId) => playerRepository.getByTeamId(teamId));
+ipcMain.handle('players:create', (event, player) => playerRepository.create(player));
+ipcMain.handle('players:update', (event, player) => playerRepository.update(player));
+ipcMain.handle('players:updateOrder', (event, teamId, orderedIds) => playerRepository.updateOrder(teamId, orderedIds));
+ipcMain.handle('players:delete', (event, playerId) => playerRepository.delete(playerId));
 
-// API para Jogadores
-ipcMain.handle('players:getByTeamId', (event, teamId) => {
-    return playerRepository.getByTeamId(teamId);
-});
-ipcMain.handle('players:create', (event, player) => {
-    playerRepository.create(player);
-});
-ipcMain.handle('players:update', (event, player) => {
-    playerRepository.update(player);
-});
-ipcMain.handle('players:updateOrder', (event, teamId, orderedIds) => {
-    playerRepository.updateOrder(teamId, orderedIds);
-});
-ipcMain.handle('players:delete', (event, playerId) => {
-    playerRepository.delete(playerId);
-});
-
-// API para Scouts
 ipcMain.handle('scouts:getAll', () => scoutRepository.getAll());
-ipcMain.handle('scouts:create', () => {
-    return scoutRepository.create();
-});
+ipcMain.handle('scouts:create', () => scoutRepository.create());
 
-// API para Itens de Scout
 ipcMain.handle('scoutItems:getByScoutId', (event, scoutId) => scoutItemRepository.getByScoutId(scoutId));
 
+// ------------------ Inicialização ------------------
+app.whenReady().then(() => {
+    // Defina o caminho para o banco em uma pasta gravável
+    const dbPath = path.join(app.getPath('userData'), 'volley-track.sqlite');
 
-// -------------------------------------------------------------------
+    // Inicializa o banco com schema
+    initDatabase(dbPath);
 
-
-// O restante do seu código permanece o mesmo
-app.whenReady().then(createWindow);
+    // Cria a janela principal
+    createWindow();
+});
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+    if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-    }
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
