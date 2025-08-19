@@ -1,88 +1,143 @@
-import { useState, useEffect, useRef } from 'react'; // Importe o useRef
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, Avatar } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// <<< NOVO: Importe os componentes do Select
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { User } from "lucide-react";
+
 import type { PlayerProps } from "../../types/TeamPlayersTypes.ts";
 
 export type PlayerModalProps = {
-    open: boolean;
-    onClose: () => void;
-    player?: PlayerProps | null;
-    onSave: (playerData: PlayerProps) => void;
+  open: boolean;
+  onClose: () => void;
+  player?: PlayerProps | null;
+  onSave: (playerData: PlayerProps) => void;
 }
 
-// Defina um estado inicial padrão
 const defaultPlayerState: PlayerProps = { name: '', number: 0, height: '', position: '', photo: '' };
 
+// <<< NOVO: Defina as opções para o Select
+const positions = ["Levantador", "Oposto", "Ponteiro", "Central", "Líbero"];
+
 export function PlayerModal({ open, onClose, player, onSave }: PlayerModalProps) {
-    const [formData, setFormData] = useState<PlayerProps>(defaultPlayerState);
-    const fileInputRef = useRef<HTMLInputElement>(null); // Ref para o input de arquivo escondido
+  const [formData, setFormData] = useState<PlayerProps>(defaultPlayerState);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        if (player) {
-            setFormData(player);
-        } else {
-            setFormData(defaultPlayerState); // Reseta para o estado padrão ao criar novo jogador
-        }
-    }, [player, open]);
+  useEffect(() => {
+    if (player) {
+      setFormData(player);
+    } else {
+      setFormData(defaultPlayerState);
+    }
+  }, [player, open]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = () => {
-                // O resultado é uma string base64 que pode ser usada no 'src' da imagem
-                setFormData(prev => ({ ...prev, photo: reader.result as string }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+  // <<< NOVO: Handler específico para o Select
+  const handlePositionChange = (value: string) => {
+    setFormData(prev => ({ ...prev, position: value }));
+  };
 
-    const handleSave = () => {
-        onSave(formData); // O formData já contém a foto em base64
-        onClose();
-    };
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFormData(prev => ({ ...prev, photo: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-    return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-            <DialogTitle>{player ? 'Editar Jogador' : 'Cadastrar Novo Jogador'}</DialogTitle>
-            <DialogContent>
-                {/* --- SEÇÃO DA FOTO ADICIONADA --- */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, gap: 1 }}>
-                    <Avatar
-                        src={formData.photo}
-                        sx={{ width: 100, height: 100, mb: 1 }}
-                        variant="rounded"
-                    />
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        Alterar Foto
-                    </Button>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handlePhotoChange}
-                        accept="image/*"
-                        style={{ display: 'none' }} // O input fica escondido
-                    />
-                </Box>
-                {/* --- FIM DA SEÇÃO DA FOTO --- */}
+  const handleSave = () => {
+    onSave(formData);
+    onClose();
+  };
 
-                <TextField autoFocus margin="dense" name="name" label="Nome" fullWidth value={formData.name} onChange={handleChange} />
-                <TextField margin="dense" name="number" label="Número" type="number" fullWidth value={formData.number || ''} onChange={handleChange} />
-                <TextField margin="dense" name="height" label="Altura (ex: 1.85)" fullWidth value={formData.height} onChange={handleChange} />
-                <TextField margin="dense" name="position" label="Posição" fullWidth value={formData.position} onChange={handleChange} />
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Cancelar</Button>
-                <Button onClick={handleSave} variant="contained">Salvar</Button>
-            </DialogActions>
-        </Dialog>
-    );
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{player ? 'Editar Jogador' : 'Cadastrar Novo Jogador'}</DialogTitle>
+        </DialogHeader>
+
+        <div className="flex flex-col items-center gap-2 pt-4">
+          <Avatar className="h-24 w-24 rounded-md">
+            <AvatarImage src={formData.photo} alt={formData.name} />
+            <AvatarFallback className="rounded-md">
+              <User className="h-12 w-12" />
+            </AvatarFallback>
+          </Avatar>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            Alterar Foto
+          </Button>
+          <input type="file" ref={fileInputRef} onChange={handlePhotoChange} accept="image/*" className="hidden"/>
+        </div>
+
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">Nome</Label>
+            <Input id="name" name="name" value={formData.name} onChange={handleChange} className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="number" className="text-right">Número</Label>
+            <Input id="number" name="number" type="number" value={formData.number || ''} onChange={handleChange} className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="height" className="text-right">Altura</Label>
+            <Input id="height" name="height" placeholder="ex: 1.85" value={formData.height} onChange={handleChange} className="col-span-3" />
+          </div>
+          {/* <<< MUDANÇA: Substituição do Input pelo Select >>> */}
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="position" className="text-right">Posição</Label>
+            <Select value={formData.position} onValueChange={handlePositionChange}>
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder="Selecione uma posição" />
+              </SelectTrigger>
+              <SelectContent>
+                {positions.map((pos) => (
+                  <SelectItem key={pos} value={pos}>
+                    {pos}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={handleSave}>Salvar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }

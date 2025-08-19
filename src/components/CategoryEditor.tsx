@@ -1,60 +1,90 @@
 import 'react';
-import { Paper, Box, TextField, Typography, IconButton, Button } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+// <<< NOVO: Importe os componentes do Select
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Trash2, PlusCircle } from "lucide-react";
+
 import type { Category, Subcategory } from '../types/ScoutTypes';
 
 interface CategoryEditorProps {
-    category: Category;
-    onChange: (category: Category) => void;
-    onDelete: () => void;
+  category: Category;
+  onChange: (category: Category) => void;
+  onDelete: () => void;
 }
 
 export function CategoryEditor({ category, onChange, onDelete }: CategoryEditorProps) {
+  // A lógica de manipulação foi unificada para lidar com o Select também
+  const handleSubcategoryChange = (index: number, field: keyof Subcategory, value: string | number) => {
+    const newSubcategories = [...category.subcategories];
+    const finalValue = field === 'weight' ? (Number(value) || 0) : value;
+    newSubcategories[index] = { ...newSubcategories[index], [field]: finalValue };
+    onChange({ ...category, subcategories: newSubcategories });
+  };
 
-    // -> O HANDLER AGORA CONVERTE O PESO PARA NÚMERO
-    const handleSubcategoryChange = (index: number, field: keyof Subcategory, value: string | number) => {
-        const newSubcategories = [...category.subcategories];
-        // Converte para número se o campo for 'weight'
-        const finalValue = field === 'weight' ? (Number(value) || 0) : value;
+  return (
+    <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-sm">
+      {/* Cabeçalho */}
+      <div className="flex items-center justify-between">
+        <div className="w-full pr-4">
+          <Label htmlFor="category-name">Nome da Categoria</Label>
+          <Input
+            id="category-name"
+            value={category.name}
+            onChange={(e) => onChange({ ...category, name: e.target.value })}
+            className="text-lg"
+          />
+        </div>
+        <Button variant="ghost" size="icon" onClick={onDelete}>
+          <Trash2 className="h-5 w-5" />
+        </Button>
+      </div>
 
-        newSubcategories[index] = { ...newSubcategories[index], [field]: finalValue };
-        onChange({ ...category, subcategories: newSubcategories });
-    };
+      {/* Seção de Sub-categorias */}
+      <div className="mt-4">
+        <h4 className="mb-2 text-sm font-medium text-muted-foreground">Sub-categorias</h4>
+        {category.subcategories.map((sub: Subcategory, index: number) => (
+          <div key={sub.id || `new-sub-${index}`} className="mb-2 flex items-center gap-2">
+            <Input placeholder="Nome" value={sub.name} onChange={(e) => handleSubcategoryChange(index, 'name', e.target.value)} />
 
-    return (
-        <Paper variant="outlined" sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <TextField
-                    variant="standard"
-                    label="Nome da Categoria"
-                    value={category.name}
-                    onChange={(e) => onChange({ ...category, name: e.target.value })}
-                />
-                <IconButton onClick={onDelete}><DeleteIcon /></IconButton>
-            </Box>
-            <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" gutterBottom>Sub-categorias</Typography>
-                {category.subcategories.map((sub: Subcategory, index: number) => (
-                    <Box key={sub.id || `new-sub-${index}`} sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1 }}>
-                        <TextField size="small" label="Nome" value={sub.name} onChange={(e) => handleSubcategoryChange(index, 'name', e.target.value)} />
-                        <TextField size="small" label="Grupo" value={sub.type} onChange={(e) => handleSubcategoryChange(index, 'type', e.target.value)} />
+            {/* <<< MUDANÇA: Substituição do Input pelo Select >>> */}
+            <Select
+              value={sub.type}
+              onValueChange={(value) => handleSubcategoryChange(index, 'type', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="resultado">Resultado</SelectItem>
+                <SelectItem value="zona">Zona</SelectItem>
+              </SelectContent>
+            </Select>
 
-                        {/* -> INPUT DE PESO ADICIONADO <- */}
-                        <TextField
-                            size="small"
-                            label="Peso"
-                            type="number"
-                            value={sub.weight}
-                            onChange={(e) => handleSubcategoryChange(index, 'weight', e.target.value)}
-                            sx={{ width: '80px' }} // Define uma largura fixa para o campo de peso
-                        />
-
-                        <IconButton size="small" /* onClick={() => handleDeleteSubcategory(index)} */><DeleteIcon fontSize="small" /></IconButton>
-                    </Box>
-                ))}
-                <Button size="small" startIcon={<AddIcon />}>Adicionar Sub-categoria</Button>
-            </Box>
-        </Paper>
-    );
+            <Input
+              placeholder="Peso"
+              type="number"
+              value={sub.weight}
+              onChange={(e) => handleSubcategoryChange(index, 'weight', e.target.value)}
+              className="w-20"
+            />
+            <Button variant="ghost" size="icon">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+        <Button variant="outline" size="sm" className="mt-2">
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Adicionar Sub-categoria
+        </Button>
+      </div>
+    </div>
+  );
 }

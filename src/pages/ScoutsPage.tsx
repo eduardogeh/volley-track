@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import {
-    Box, Paper, Button, Typography, List, ListItemButton, ListItemText, IconButton
-} from '@mui/material';
+// <<< MUDANÇA: Imports do shadcn/ui e lucide-react
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { ArrowLeft, PlusCircle } from "lucide-react";
 import { Link as RouterLink } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import { ScoutEditor } from '../components/ScoutEditor';
 import type { ScoutModel } from '../types/ScoutTypes';
 
 export function ScoutsPage() {
-    const [scouts, setScouts] = useState<ScoutModel[]>([]);
-    const [selectedScout, setSelectedScout] = useState<ScoutModel | null>(null);
+  const [scouts, setScouts] = useState<ScoutModel[]>([]);
+  const [selectedScout, setSelectedScout] = useState<ScoutModel | null>(null);
 
     // MOCK DE SCOUT
     const mockScout: ScoutModel = {
@@ -97,77 +96,82 @@ export function ScoutsPage() {
         ]
     };
 
-    useEffect(() => {
-        // Substitui o uso da API por um mock local
-        setTimeout(() => {
-            setScouts([mockScout]);
-            setSelectedScout(mockScout);
-        }, 100); // simula carregamento
-    }, []);
+  useEffect(() => {
+    setTimeout(() => {
+      setScouts([mockScout]);
+      setSelectedScout(mockScout);
+    }, 100);
+  }, []);
 
-    const handleAddNewScout = async () => {
-        alert('Adicionar novo scout ainda não implementado');
-    };
+  const handleAddNewScout = async () => {
+    alert('Adicionar novo scout ainda não implementado');
+  };
 
-    const handleUpdateScout = async (scout: ScoutModel) => {
-        console.log('Atualizando scout (mock)', scout);
-    };
+  const handleUpdateScout = async (scout: ScoutModel) => {
+    console.log('Atualizando scout (mock)', scout);
+  };
 
-    return (
-        <Box sx={{height: '100vh', width: '100vw', p: 2, pt: 8, boxSizing: 'border-box'}}>
-            <RouterLink to="/" style={{position: 'absolute', top: 16, left: 16, zIndex: 10}}>
-                <Button variant="contained" startIcon={<ArrowBackIcon/>}>Voltar</Button>
-            </RouterLink>
+  return (
+    // <<< MUDANÇA: Layout principal com Tailwind CSS
+    <main className="box-border h-screen w-screen p-2 pt-16">
+      {/* <<< MUDANÇA: Botão "Voltar" com shadcn e 'asChild' para roteamento */}
+      <Button asChild className="absolute left-4 top-4 z-10">
+        <RouterLink to="/">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Voltar
+        </RouterLink>
+      </Button>
 
-            <Box sx={{display: 'flex', flexDirection: 'row', height: '100%', gap: 2}}>
-                <Box sx={{flexBasis: '33.33%', flexShrink: 0}}>
-                    <Paper elevation={1} sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-                        <Box sx={{
-                            p: 1, pl: 2, borderBottom: '1px solid #ddd',
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-                        }}>
-                            <Typography variant="h6">Scouts</Typography>
-                            <IconButton onClick={handleAddNewScout} color="primary" title="Adicionar novo scout">
-                                <AddCircleOutlineIcon/>
-                            </IconButton>
-                        </Box>
-                        <Box sx={{flexGrow: 1, overflowY: 'auto'}}>
-                            <List sx={{pt: 0}}>
-                                {scouts.map((scout) => (
-                                    <ListItemButton
-                                        key={scout.id}
-                                        selected={selectedScout?.id === scout.id}
-                                        onClick={() => setSelectedScout(scout)}
-                                    >
-                                        <ListItemText primary={scout.name}/>
-                                    </ListItemButton>
-                                ))}
-                            </List>
-                        </Box>
-                    </Paper>
-                </Box>
+      {/* <<< MUDANÇA: Estrutura de duas colunas com Flexbox do Tailwind */}
+      <div className="flex h-full flex-row gap-2">
+        {/* Coluna da Esquerda (Sidebar) */}
+        <aside className="basis-1/3 shrink-0">
+          {/* <<< MUDANÇA: Substituição do Paper por div com estilo de card */}
+          <div className="flex h-full flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
+            {/* Cabeçalho da Sidebar */}
+            <div className="flex items-center justify-between border-b p-2 pl-4">
+              <h3 className="text-lg font-semibold">Scouts</h3>
+              <Button variant="ghost" size="icon" onClick={handleAddNewScout} title="Adicionar novo scout">
+                <PlusCircle className="h-5 w-5" />
+              </Button>
+            </div>
+            {/* Lista de Scouts */}
+            <div className="flex-grow overflow-y-auto p-1">
+              {scouts.map((scout) => (
+                <button
+                  key={scout.id}
+                  onClick={() => setSelectedScout(scout)}
+                  className={cn(
+                    "w-full rounded-md p-2 text-left text-sm transition-colors hover:bg-accent",
+                    selectedScout?.id === scout.id && "bg-accent font-semibold"
+                  )}
+                >
+                  {scout.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
 
-                <Box sx={{flexBasis: '66.67%', flexGrow: 1, minWidth: 0}}>
-                    <Paper elevation={3} sx={{height: '100%', overflowY: 'auto'}}>
-                        {selectedScout ? (
-                            <ScoutEditor
-                                key={selectedScout.id}
-                                initialModel={selectedScout}
-                                onSave={handleUpdateScout}
-                            />
-                        ) : (
-                            <Box sx={{
-                                p: 3, display: 'flex', alignItems: 'center',
-                                justifyContent: 'center', height: '100%'
-                            }}>
-                                <Typography variant="h6" color="textSecondary">
-                                    Selecione ou crie um scout para começar.
-                                </Typography>
-                            </Box>
-                        )}
-                    </Paper>
-                </Box>
-            </Box>
-        </Box>
-    );
+        {/* Coluna da Direita (Editor) */}
+        <section className="basis-2/3 flex-grow">
+          <div className="h-full overflow-y-auto rounded-lg border bg-card text-card-foreground shadow-sm">
+            {selectedScout ? (
+              <ScoutEditor
+                key={selectedScout.id}
+                initialModel={selectedScout}
+                onSave={handleUpdateScout}
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center p-3">
+                <p className="text-lg text-muted-foreground">
+                  Selecione ou crie um scout para começar.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
 }

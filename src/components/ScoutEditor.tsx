@@ -1,7 +1,11 @@
 // src/components/scouts/ScoutModelEditor.tsx
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Typography, Button, Paper, Divider, Modal } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PlusCircle } from "lucide-react";
 import { CategoryCard } from './CategoryCard';
 import { CategoryEditor } from './CategoryEditor'; // Supondo que você tenha este componente para o modal
 import type { ScoutModel, Category } from '../types/ScoutTypes';
@@ -21,12 +25,12 @@ export function ScoutEditor({ initialModel, onSave }: ScoutModelEditorProps) {
         setModel(initialModel);
     }, [initialModel]);
 
-    const handleModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        // Garante que valores numéricos sejam salvos como números
-        const numericValue = (name === 'grid_width' || name === 'grid_height') ? parseInt(value, 10) || 1 : value;
-        setModel(prev => ({ ...prev, [name]: numericValue }));
-    };
+  const handleModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    // <<< ALTERADO: Lógica simplificada para lidar apenas com grid_width
+    const numericValue = name === 'grid_width' ? parseInt(value, 10) || 1 : value;
+    setModel(prev => ({ ...prev, [name]: numericValue }));
+  };
 
     const handleCategoriesChange = (updatedCategories: Category[]) => {
         setModel(prev => ({ ...prev, categories: updatedCategories }));
@@ -61,70 +65,71 @@ export function ScoutEditor({ initialModel, onSave }: ScoutModelEditorProps) {
         setEditingIndex(null);
     };
 
+  return (
+    <div>
+      {/* Cabeçalho do Editor */}
+      <div className="border-b p-4">
+        <h2 className="mb-4 text-2xl font-bold tracking-tight">Editar Modelo de Scout</h2>
+        <div className="flex items-end gap-4">
+          <div className="flex-grow">
+            <Label htmlFor="model-name">Nome do Modelo</Label>
+            <Input id="model-name" name="name" value={model.name} onChange={handleModelChange} />
+          </div>
+          <div>
+            {/* <<< ALTERADO: Label de "Largura" para "Colunas" >>> */}
+            <Label htmlFor="grid-width">Colunas</Label>
+            <Input id="grid-width" name="grid_width" type="number" value={model.grid_width} onChange={handleModelChange} inputMode="numeric" min={1} max={12} />
+          </div>
+          {/* <<< REMOVIDO: Input de "Altura Grid" >>> */}
+          <Button onClick={() => onSave(model)}>Salvar Modelo</Button>
+        </div>
+      </div>
 
-    return (
-        <Box>
-            <Paper elevation={0} sx={{ p: 2, borderBottom: '1px solid #ddd' }}>
-                <Typography variant="h5" gutterBottom>Editar Modelo de Scout</Typography>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <TextField name="name" label="Nome do Modelo" value={model.name} onChange={handleModelChange} sx={{ flexGrow: 1 }} />
-                    <TextField name="grid_width" label="Largura Grid" type="number" value={model.grid_width} onChange={handleModelChange} inputProps={{ min: 1, max: 12 }} />
-                    <TextField name="grid_height" label="Altura Grid" type="number" value={model.grid_height} onChange={handleModelChange} inputProps={{ min: 1 }} />
-                    <Button variant="contained" onClick={() => onSave(model)}>Salvar Modelo</Button>
-                </Box>
-            </Paper>
+      {/* Seção das Categorias */}
+      <div className="p-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-semibold">Categorias de Análise</h3>
+          <Button variant="outline" size="sm" onClick={() => openCategoryModal(null, null)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Adicionar Categoria
+          </Button>
+        </div>
+        <Separator className="my-4" />
 
-            <Box sx={{ p: 2 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6">Categorias de Análise</Typography>
-                    <Button size="small" startIcon={<AddIcon />} onClick={() => openCategoryModal(null, null)}>
-                        Adicionar Categoria
-                    </Button>
-                </Box>
-                <Divider sx={{ my: 2 }} />
+        {/* Grid de Cards de Categoria */}
+        <div className="overflow-x-auto pb-4">
+          <div
+            className="grid justify-start gap-4"
+            // <<< MUDANÇA 2: '1fr' trocado por 'min-content' >>>
+            style={{ gridTemplateColumns: `repeat(${model.grid_width}, min-content)` }}
+          >
+            {model.categories.map((category, index) => (
+              <CategoryCard
+                key={category.id || `cat-${index}`}
+                category={category}
+                onEdit={() => openCategoryModal(category, index)}
+                onDelete={() => handleDeleteCategory(index)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
 
-                {/* --- ÁREA DO GRID ATUALIZADA --- */}
-                <Box
-                    sx={{
-                        display: 'grid',
-                        gridTemplateColumns: `repeat(${model.grid_width}, min-content)`,
-                        justifyContent: 'start',
-                        gap: 2
-                    }}
-                >
-                    {model.categories.map((category, index) => (
-                        // -> 2. O <Grid item> não é mais necessário
-                        <CategoryCard
-                            key={category.id || `cat-${index}`}
-                            category={category}
-                            onEdit={() => openCategoryModal(category, index)}
-                            onDelete={() => handleDeleteCategory(index)}
-                        />
-                    ))}
-                </Box>
-            </Box>
-
-            <Modal open={modalOpen} onClose={closeModal}>
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 500,
-                    bgcolor: 'background.paper',
-                    boxShadow: 24,
-                    p: 4,
-                    borderRadius: 2,
-                }}>
-                    {editingCategory && (
-                        <CategoryEditor
-                            category={editingCategory}
-                            onChange={saveCategory}
-                            onClose={closeModal}
-                        />
-                    )}
-                </Box>
-            </Modal>
-        </Box>
-    );
+      {/* Modal/Dialog para Editar Categoria */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{editingIndex !== null ? 'Editar Categoria' : 'Nova Categoria'}</DialogTitle>
+          </DialogHeader>
+          {editingCategory && (
+            <CategoryEditor
+              category={editingCategory}
+              onChange={saveCategory}
+              onDelete={closeModal} // onClose foi renomeado para onDelete no seu componente
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }

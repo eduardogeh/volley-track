@@ -1,84 +1,95 @@
 import 'react';
-import { Box, Button, Divider, Chip } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+// Importe os componentes do shadcn/ui que você adicionou ao projeto
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+
+// Importe um ícone da biblioteca lucide-react (padrão com shadcn)
+import { Plus } from 'lucide-react';
+
 import { PlayerCard } from './PlayerCard.tsx';
 import type {PlayerProps} from "../../types/TeamPlayersTypes.ts";
 
 export type PlayerGridProps = {
-    players?: PlayerProps[];
-    playerToSwap?: PlayerProps;
-    onPlayerSwap: (player: PlayerProps) => void;
-    onEditPlayer: (player: PlayerProps | null) => void;
-    onAddPlayer: () => void;
-    colorOfCard?: string;
-    onDeletePlayer: (player: PlayerProps) => void;
+  players?: PlayerProps[];
+  playerToSwap?: PlayerProps;
+  onPlayerSwap: (player: PlayerProps) => void;
+  onEditPlayer: (player: PlayerProps | null) => void;
+  onAddPlayer: () => void;
+  colorOfCard?: string;
+  onDeletePlayer: (player: PlayerProps) => void;
 }
 
 export function PlayerGrid({
-                               players, // Receba a prop normalmente, sem valor padrão aqui
-                               playerToSwap,
-                               onPlayerSwap,
-                               onEditPlayer,
-                               onAddPlayer,
-                               colorOfCard,
-                               onDeletePlayer,
+                             players,
+                             playerToSwap,
+                             onPlayerSwap,
+                             onEditPlayer,
+                             onAddPlayer,
+                             colorOfCard,
+                             onDeletePlayer,
                            }: PlayerGridProps) {
 
-    const playerList = Array.isArray(players) ? players : [];
+  const playerList = Array.isArray(players) ? players : [];
 
-    const titulares = playerList.slice(0, 6);
-    const reservas = playerList.slice(6);
+  const titulares = playerList.slice(0, 6);
+  const reservas = playerList.slice(6);
 
-    const flexContainerSx = {
-        display: 'flex',
-        flexWrap: 'wrap',
-        margin: -0.5,
-    };
+  // Função para renderizar o divisor com texto no meio
+  const renderDividerWithLabel = (label: string) => (
+    <div className="relative my-4">
+      <div className="absolute inset-0 flex items-center">
+        <Separator />
+      </div>
+      <div className="relative flex justify-center">
+        <Badge variant="secondary">{label}</Badge>
+      </div>
+    </div>
+  );
 
-    return (
+  return (
+    <>
+      <Button onClick={onAddPlayer} className="mb-4">
+        <Plus className="mr-2 h-4 w-4" />
+        Adicionar Jogador
+      </Button>
+
+      {renderDividerWithLabel("Titulares")}
+
+      {/* Container principal dos jogadores com Tailwind CSS */}
+      <div className="flex flex-wrap gap-4">
+        {titulares.map((player) => (
+          <PlayerCard
+            key={player.id}
+            player={player}
+            onCardClick={onPlayerSwap}
+            onEditClick={onEditPlayer}
+            isSelected={playerToSwap?.id === player.id}
+            colorOfCard={colorOfCard}
+            onDeletePlayer={onDeletePlayer}
+          />
+        ))}
+      </div>
+
+      {reservas.length > 0 && (
         <>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={onAddPlayer} sx={{ mb: 2 }}>
-                Adicionar Jogador
-            </Button>
+          {renderDividerWithLabel("Reservas")}
 
-            <Divider sx={{ my: 2 }}>
-                <Chip label="Titulares" />
-            </Divider>
-
-            <Box sx={flexContainerSx}>
-                {titulares.map((player) => (
-                    <PlayerCard
-                        key={player.id}
-                        player={player}
-                        onCardClick={onPlayerSwap}
-                        onEditClick={onEditPlayer}
-                        isSelected={playerToSwap?.id === player.id}
-                        colorOfCard={colorOfCard}
-                        onDeletePlayer={onDeletePlayer}
-                    />
-                ))}
-            </Box>
-
-            {reservas.length > 0 && (
-                <>
-                    <Divider sx={{ my: 2 }}>
-                        <Chip label="Reservas" />
-                    </Divider>
-                    <Box sx={flexContainerSx}>
-                        {reservas.map((player) => (
-                            <PlayerCard
-                                key={player.id}
-                                player={player}
-                                onCardClick={onPlayerSwap}
-                                onEditClick={onEditPlayer}
-                                isSelected={playerToSwap?.id === player.id}
-                                colorOfCard={colorOfCard}
-                                onDeletePlayer={onDeletePlayer}
-                            />
-                        ))}
-                    </Box>
-                </>
-            )}
+          <div className="flex flex-wrap gap-4">
+            {reservas.map((player) => (
+              <PlayerCard
+                key={player.id}
+                player={player}
+                onCardClick={onPlayerSwap}
+                onEditClick={onEditPlayer}
+                isSelected={playerToSwap?.id === player.id}
+                colorOfCard={colorOfCard}
+                onDeletePlayer={onDeletePlayer}
+              />
+            ))}
+          </div>
         </>
-    );
+      )}
+    </>
+  );
 }

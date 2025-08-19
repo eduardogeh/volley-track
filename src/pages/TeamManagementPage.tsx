@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Box, Paper, Button, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { TeamEditor } from '../components/teams/TeamEditor.tsx';
 import { PlayerGrid } from '../components/players/PlayerGrid.tsx';
 import type { PlayerProps, Team } from "../types/TeamPlayersTypes.ts";
@@ -148,53 +147,57 @@ export function TeamManagementPage() {
         }
     };
 
-    // --- O JSX de retorno permanece o mesmo ---
-    return (
-        <Box sx={{ height: '100vh', width: '100vw', p: 2, pt: 8, boxSizing: 'border-box' }}>
-            <RouterLink to="/" style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }}>
-                <Button variant="contained" startIcon={<ArrowBackIcon />}>Voltar</Button>
-            </RouterLink>
+  return (
+    <main className="box-border h-screen w-screen p-2 pt-16">
+      <Button asChild className="absolute left-4 top-4 z-10">
+        <RouterLink to="/">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Voltar
+        </RouterLink>
+      </Button>
 
-            <PlayerModal open={isModalOpen} onClose={handleCloseModal} player={editingPlayer} onSave={handleSavePlayer} />
+      <PlayerModal open={isModalOpen} onClose={handleCloseModal} player={editingPlayer} onSave={handleSavePlayer} />
 
-            <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%', gap: 2 }}>
-                <Box sx={{ flexBasis: '33.33%', flexShrink: 0 }}>
-                    <TeamList
-                        teams={teams}
-                        selectedTeamId={selectedTeam?.id}
-                        onSelectTeam={handleSelectTeam}
-                        onAddTeam={handleAddNewTeam}
-                        onDeleteTeam={handleDeleteTeam}
-                    />
-                </Box>
+      <div className="flex h-full flex-row gap-2">
+        {/* Coluna da Esquerda (Sidebar com TeamList) */}
+        <aside className="basis-1/3 shrink-0">
+          <TeamList
+            teams={teams}
+            selectedTeamId={selectedTeam?.id}
+            onSelectTeam={handleSelectTeam}
+            onAddTeam={handleAddNewTeam}
+            onDeleteTeam={handleDeleteTeam}
+          />
+        </aside>
 
-                <Box sx={{ flexBasis: '66.67%', flexGrow: 1, minWidth: 0 }}>
-                    <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        {selectedTeam ? (
-                            <>
-                                <TeamEditor team={selectedTeam} onSave={handleTeamUpdate} />
-                                <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2 }}>
-                                    <PlayerGrid
-                                        players={players}
-                                        playerToSwap={playerToSwap || undefined}
-                                        onPlayerSwap={handlePlayerSwap}
-                                        onEditPlayer={handleOpenPlayerModal}
-                                        onAddPlayer={() => handleOpenPlayerModal(null)}
-                                        colorOfCard={selectedTeam?.color}
-                                        onDeletePlayer={handleDeletePlayer}
-                                    />
-                                </Box>
-                            </>
-                        ) : (
-                            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                <Typography variant="h6" color="textSecondary">
-                                    Selecione ou crie um time para começar.
-                                </Typography>
-                            </Box>
-                        )}
-                    </Paper>
-                </Box>
-            </Box>
-        </Box>
-    );
+        {/* Coluna da Direita (Editor de Time e Grid de Jogadores) */}
+        <section className="basis-2/3 flex-grow">
+          <div className="flex h-full flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
+            {selectedTeam ? (
+              <>
+                <TeamEditor team={selectedTeam} onSave={handleTeamUpdate} />
+                <div className="flex-grow overflow-y-auto p-2">
+                  <PlayerGrid
+                    players={players}
+                    playerToSwap={playerToSwap || undefined}
+                    onPlayerSwap={handlePlayerSwap}
+                    onEditPlayer={handleOpenPlayerModal}
+                    onAddPlayer={() => handleOpenPlayerModal(null)}
+                    colorOfCard={selectedTeam?.color}
+                    onDeletePlayer={handleDeletePlayer}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="flex h-full items-center justify-center p-3">
+                <p className="text-lg text-muted-foreground">
+                  Selecione ou crie um time para começar.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
 }
