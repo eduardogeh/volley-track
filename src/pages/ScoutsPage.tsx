@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { ArrowLeft, PlusCircle, Trash2 } from "lucide-react";
 import { Link as RouterLink } from 'react-router-dom';
 
-import { ScoutEditor } from '../components/ScoutEditor';
+import { ScoutEditor } from '../components/scouts/ScoutEditor.tsx';
 import type { ScoutModel } from '../types/ScoutTypes';
 
 export function ScoutsPage() {
@@ -54,7 +54,6 @@ export function ScoutsPage() {
 
   // <<< ALTERADO: Atualiza o scout selecionado no banco de dados >>>
   const handleUpdateScout = async (scoutToSave: ScoutModel) => {
-    console.log("Salvando scout:", scoutToSave);
     await window.api.scout.save(scoutToSave);
     // Recarrega os dados para garantir que a lista lateral seja atualizada (ex: se o nome mudou)
     await refetchAndSelectScout(scoutToSave.id);

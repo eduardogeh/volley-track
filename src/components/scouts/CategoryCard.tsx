@@ -1,8 +1,8 @@
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardTitle } from "@/components/ui/card.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import { Pencil, Trash2 } from "lucide-react";
 
-import type { Category } from '../types/ScoutTypes';
+import type { Category } from '../../types/ScoutTypes.ts';
 
 interface Props {
   category: Category;

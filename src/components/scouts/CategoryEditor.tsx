@@ -1,26 +1,25 @@
 import 'react';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select.tsx"
 import { Trash2, PlusCircle } from "lucide-react";
-import type { Category, Subcategory } from '../types/ScoutTypes';
+import type { Category, Subcategory } from '../../types/ScoutTypes.ts';
 
 interface CategoryEditorProps {
   category: Category;
   onChange: (updatedCategory: Category) => void;
   onSave: () => void;
   onClose: () => void;
-  onDelete: () => void;
 }
 
-export function CategoryEditor({ category, onChange, onSave, onClose, onDelete }: CategoryEditorProps) {
+export function CategoryEditor({ category, onChange, onSave, onClose }: CategoryEditorProps) {
 
   const handleSubcategoryChange = (index: number, field: keyof Subcategory, value: string | number) => {
     const newSubcategories = [...category.subcategories];
@@ -67,11 +66,6 @@ export function CategoryEditor({ category, onChange, onSave, onClose, onDelete }
             onChange={(e) => onChange({ ...category, color: e.target.value })}
             className="h-9 w-full p-1" // 'w-full' para ocupar o espaço disponível
           />
-        </div>
-        <div className="md:col-span-1 flex justify-end"> {/* Botão de excluir ao lado da cor ou em linha própria */}
-          <Button variant="ghost" size="icon" onClick={onDelete} title="Excluir categoria">
-            <Trash2 className="h-5 w-5 text-destructive" />
-          </Button>
         </div>
 
         {/* <<< NOVO: Campos de tempo em uma nova linha com grid >>> */}

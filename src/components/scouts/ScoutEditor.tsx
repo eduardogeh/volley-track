@@ -1,14 +1,14 @@
 // src/components/scouts/ScoutEditor.tsx
 import React, { useState, useEffect } from 'react';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx";
 import { PlusCircle } from "lucide-react";
-import { CategoryCard } from './CategoryCard';
-import { CategoryEditor } from './CategoryEditor';
-import type { ScoutModel, Category } from '../types/ScoutTypes';
+import { CategoryCard } from './CategoryCard.tsx';
+import { CategoryEditor } from './CategoryEditor.tsx';
+import type { ScoutModel, Category } from '../../types/ScoutTypes.ts';
 
 interface ScoutEditorProps {
   initialModel: ScoutModel;
@@ -34,6 +34,7 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
   // Função para atualizar o estado do modelo com as novas categorias
   const handleCategoriesChange = (updatedCategories: Category[]) => {
     setModel(prev => ({ ...prev, categories: updatedCategories }));
+
   };
 
   const openCategoryModal = (category: Category | null, index: number | null) => {
@@ -79,21 +80,11 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
     closeModal();
   };
 
-  // <<< ALTERADO: Função para deletar a categoria a partir do modal >>>
-  const deleteCategoryAndClose = () => {
-    if (editingIndex === null) {
-      closeModal(); // Se for uma nova categoria, apenas fecha o modal
-      return;
-    }
-    const newCategories = model.categories.filter((_, i) => i !== editingIndex);
-    handleCategoriesChange(newCategories);
-    closeModal();
-  };
-
   // Deleta a categoria a partir do card na grid principal
   const handleDeleteCategoryFromGrid = (index: number) => {
     const newCategories = model.categories.filter((_, i) => i !== index);
     handleCategoriesChange(newCategories);
+    onSave({ ...model, categories: newCategories });
   };
 
   const closeModal = () => {
@@ -161,7 +152,6 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
               onChange={handleCategoryEdit}
               onSave={saveCategoryAndClose}
               onClose={closeModal}
-              onDelete={deleteCategoryAndClose}
             />
           )}
         </DialogContent>
