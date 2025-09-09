@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, ipcRenderer} = require('electron');
 const path = require('path');
 
 // Importa a função de inicialização do banco
@@ -8,7 +8,6 @@ const { initDatabase } = require('./database/connection.cjs');
 const teamRepository = require('./database/teamRepository.cjs');
 const playerRepository = require('./database/playerRepository.cjs');
 const scoutRepository = require('./database/scoutRepository.cjs');
-const scoutItemRepository = require('./database/scoutItemRepository.cjs');
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -42,10 +41,9 @@ ipcMain.handle('players:update', (event, player) => playerRepository.update(play
 ipcMain.handle('players:updateOrder', (event, teamId, orderedIds) => playerRepository.updateOrder(teamId, orderedIds));
 ipcMain.handle('players:delete', (event, playerId) => playerRepository.delete(playerId));
 
-ipcMain.handle('scouts:getAll', () => scoutRepository.getAll());
-ipcMain.handle('scouts:create', () => scoutRepository.create());
-
-ipcMain.handle('scoutItems:getByScoutId', (event, scoutId) => scoutItemRepository.getByScoutId(scoutId));
+ipcMain.handle('scout:getAll', () => scoutRepository.getAll());
+ipcMain.handle('scout:save', (event, model) => scoutRepository.save(model));
+ipcMain.handle('scout:delete', (event, id) => scoutRepository.delete(id));
 
 // ------------------ Inicialização ------------------
 app.whenReady().then(() => {

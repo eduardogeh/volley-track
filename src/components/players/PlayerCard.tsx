@@ -1,9 +1,7 @@
 import 'react';
-// Importe os componentes e ícones necessários
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Pencil, Trash2 } from "lucide-react";
-
 import type { PlayerProps } from "../../types/TeamPlayersTypes.ts";
 
 export type PlayerCardProps = {
@@ -19,19 +17,16 @@ export function PlayerCard({ player, onCardClick, onEditClick, isSelected, color
 
   if (!player) return null;
 
-  // Handler para evitar que o clique nos botões propague para o card
   const handleActionClick = (e: React.MouseEvent, action: () => void) => {
     e.stopPropagation();
     action();
   };
 
-  // Estilo dinâmico para o box-shadow, já que a cor vem de uma prop
   const cardStyle = {
     boxShadow: isSelected ? `0 0 15px ${colorOfCard || 'hsl(var(--primary))'}` : 'none',
   };
 
   return (
-    // Container com larguras responsivas do Tailwind
     <div className="box-border w-1/4 p-1 sm:w-[16.667%] md:w-1/8">
       <div
         onClick={() => onCardClick(player)}
@@ -44,7 +39,6 @@ export function PlayerCard({ player, onCardClick, onEditClick, isSelected, color
         <img
           src={player.photo || '/no-image.png'}
           alt={player.name}
-          // Garante a proporção e que a imagem cubra o espaço
           className="aspect-[1/1.2] w-full object-cover"
         />
 

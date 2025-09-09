@@ -12,6 +12,8 @@ export type Category = {
     name: string;
     color?: string;
     subcategories: Subcategory[];
+    time_to_clip_before_event?: number;
+    time_to_clip_after_event?: number;
 };
 
 export type ScoutModel = {

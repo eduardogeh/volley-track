@@ -1,12 +1,8 @@
 import 'react';
-// Importe os componentes do shadcn/ui que você adicionou ao projeto
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-
-// Importe um ícone da biblioteca lucide-react (padrão com shadcn)
 import { Plus } from 'lucide-react';
-
 import { PlayerCard } from './PlayerCard.tsx';
 import type {PlayerProps} from "../../types/TeamPlayersTypes.ts";
 
@@ -21,21 +17,20 @@ export type PlayerGridProps = {
 }
 
 export function PlayerGrid({
-                             players,
-                             playerToSwap,
-                             onPlayerSwap,
-                             onEditPlayer,
-                             onAddPlayer,
-                             colorOfCard,
-                             onDeletePlayer,
-                           }: PlayerGridProps) {
+  players,
+  playerToSwap,
+  onPlayerSwap,
+  onEditPlayer,
+  onAddPlayer,
+  colorOfCard,
+  onDeletePlayer,
+}: PlayerGridProps) {
 
   const playerList = Array.isArray(players) ? players : [];
 
   const titulares = playerList.slice(0, 6);
   const reservas = playerList.slice(6);
 
-  // Função para renderizar o divisor com texto no meio
   const renderDividerWithLabel = (label: string) => (
     <div className="relative my-4">
       <div className="absolute inset-0 flex items-center">
@@ -56,7 +51,7 @@ export function PlayerGrid({
 
       {renderDividerWithLabel("Titulares")}
 
-      {/* Container principal dos jogadores com Tailwind CSS */}
+      {/* Container principal dos jogadores */}
       <div className="flex flex-wrap gap-4">
         {titulares.map((player) => (
           <PlayerCard

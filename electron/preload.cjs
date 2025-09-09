@@ -19,10 +19,8 @@ contextBridge.exposeInMainWorld('api', {
         delete: (playerId) => ipcRenderer.invoke('players:delete', playerId),
     },
     scout: {
-        getAll: () => ipcRenderer.invoke('scouts:getAll'),
-        create: () => ipcRenderer.invoke('scouts:create'),
-    },
-    scoutItem: {
-        getByScoutId: (scoutId) => ipcRenderer.invoke('scoutItems:getByScoutId', scoutId),
+        getAll: () => ipcRenderer.invoke('scout:getAll'),
+        save: (model) => ipcRenderer.invoke('scout:save', model),
+        delete: (id) => ipcRenderer.invoke('scout:delete', id),
     },
 });

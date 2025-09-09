@@ -1,6 +1,5 @@
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator"; // Usado para as divisórias
 import { Pencil, Trash2 } from "lucide-react";
 
 import type { Category } from '../types/ScoutTypes';
@@ -11,7 +10,6 @@ interface Props {
   onDelete: () => void;
 }
 
-// A função auxiliar para converter HEX para RGBA permanece a mesma
 function hexToRgba(hex: string = '#cccccc', alpha: number = 0.1): string {
   if (!hex || hex.length < 4) return `rgba(204, 204, 204, ${alpha})`;
   const r = parseInt(hex.slice(1, 3), 16);
@@ -21,28 +19,28 @@ function hexToRgba(hex: string = '#cccccc', alpha: number = 0.1): string {
 }
 
 export function CategoryCard({ category, onEdit, onDelete }: Props) {
-  // A lógica de filtragem permanece a mesma
   const resultadoSubcategories = category.subcategories?.filter(sub => sub.type === 'resultado');
   const zonaSubcategories = category.subcategories?.filter(sub => sub.type === 'zona');
 
-  // <<< MUDANÇA: Estilos dinâmicos para o Card
   const cardStyle = {
-    backgroundColor: hexToRgba(category.color, 0.1),
-    borderColor: hexToRgba(category.color, 0.3),
+    backgroundColor: hexToRgba(category.color, 0.25),
+    borderColor: hexToRgba(category.color, 0.4),
   };
 
   return (
-    <Card className="flex h-[120px] min-w-[180px] max-w-[220px]" style={cardStyle}>
+    <Card className="flex h-[160px] min-w-[200px] max-w-[260px]" style={cardStyle}>
       <CardContent className="flex h-full w-full flex-col p-0">
-        {/* Cabeçalho do Card */}
+
+        {/* <<< ALTERADO: Layout do cabeçalho ajustado para 'justify-between' >>> */}
         <div className="flex h-[30%] items-center justify-between p-2">
-          <CardTitle className="text-sm font-bold">{category.name}</CardTitle>
+          <CardTitle className="text-base font-bold">{category.name}</CardTitle>
+          {/* <<< ALTERADO: Removido o posicionamento absoluto dos botões >>> */}
           <div>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onEdit}>
-              <Pencil className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+              <Pencil className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDelete}>
-              <Trash2 className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onDelete}>
+              <Trash2 className="h-5 w-5" />
             </Button>
           </div>
         </div>
@@ -52,10 +50,8 @@ export function CategoryCard({ category, onEdit, onDelete }: Props) {
           {resultadoSubcategories && resultadoSubcategories.length > 0 && (
             <div className="flex h-1/2 w-full border-t">
               {resultadoSubcategories.map((sub) => (
-                <div key={sub.id} className="group flex flex-grow basis-0 items-center justify-center">
-                  <span className="text-xs">{sub.name}</span>
-                  {/* Adiciona separador vertical, exceto no último item */}
-                  <Separator orientation="vertical" className="last-of-type:hidden" />
+                <div key={sub.id} className="flex flex-grow basis-0 items-center justify-center border-r border-border/50 last:border-r-0">
+                  <span className="text-base font-medium">{sub.name}</span>
                 </div>
               ))}
             </div>
@@ -64,9 +60,8 @@ export function CategoryCard({ category, onEdit, onDelete }: Props) {
           {zonaSubcategories && zonaSubcategories.length > 0 && (
             <div className="flex h-1/2 w-full border-t">
               {zonaSubcategories.map((sub) => (
-                <div key={sub.id} className="group flex flex-grow basis-0 items-center justify-center">
-                  <span className="text-xs">{sub.name}</span>
-                  <Separator orientation="vertical" className="last-of-type:hidden" />
+                <div key={sub.id} className="flex flex-grow basis-0 items-center justify-center border-r border-border/50 last:border-r-0">
+                  <span className="text-base font-medium">{sub.name}</span>
                 </div>
               ))}
             </div>

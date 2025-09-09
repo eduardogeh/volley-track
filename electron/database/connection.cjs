@@ -69,6 +69,8 @@ function setupSchema() {
             model_id INTEGER NOT NULL,
             name TEXT NOT NULL,
             color TEXT DEFAULT '#cccccc',
+            time_to_clip_before_event INTEGER NOT NULL DEFAULT 5, -- <<< NOVO
+            time_to_clip_after_event INTEGER NOT NULL DEFAULT 5,  -- <<< NOVO
             FOREIGN KEY (model_id) REFERENCES scout_models (id) ON DELETE CASCADE
         );
 

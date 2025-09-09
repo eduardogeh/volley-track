@@ -1,5 +1,5 @@
 import type { PlayerProps, Team } from "./types/TeamPlayersTypes.ts";
-import type {Scout, ScoutItem} from "./types/ScoutTypes.ts";
+import type {Scout} from "./types/ScoutTypes.ts";
 
 export {};
 
@@ -21,11 +21,9 @@ declare global {
             };
             scout: {
                 getAll: () => Promise<Scout[]>;
-                create: () => Promise<number>;
+                save: (scout: Partial<Omit<Scout, 'id'>>) => Promise<number>;
+                delete: (scoutId: number) => Promise<void>;
             },
-            scoutItem: {
-                getByScoutId: (scoutId: number) => Promise<ScoutItem[]>;
-            }
         };
     }
 }
