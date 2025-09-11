@@ -1,9 +1,7 @@
-// electron/database/scoutRepository.cjs
 const { getDb } = require('./connection.cjs');
 
 const scoutRepository = {
     getAll: () => {
-        // Implementação para carregar todos os modelos e seus dados aninhados
         const db = getDb();
         const models = db.prepare('SELECT * FROM scout_models').all();
 
@@ -79,8 +77,6 @@ const scoutRepository = {
     },
 
     delete: (id) => {
-        // Graças ao 'ON DELETE CASCADE', deletar o modelo também deletará
-        // suas categorias e subcategorias associadas.
         return getDb().prepare('DELETE FROM scout_models WHERE id = ?').run(id);
     },
 };

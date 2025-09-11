@@ -2,7 +2,6 @@ const {getDb} = require('./connection.cjs');
 
 const playerRepository = {
     create(player) {
-        // Calcula a próxima posição na ordem
         const orderResult = getDb().prepare('SELECT COUNT(*) as count FROM players WHERE team_id = ?').get(player.team_id);
         const nextOrder = orderResult.count;
 
@@ -15,11 +14,9 @@ const playerRepository = {
     },
 
     getByTeamId(teamId) {
-        // A ordenação é a responsabilidade desta função
         return getDb().prepare('SELECT * FROM players WHERE team_id = ? ORDER BY player_order ASC').all(teamId);
     },
 
-    // Função robusta para atualizar a ordem de uma lista inteira de jogadores
     updateOrder(teamId, orderedPlayerIds) {
         const updateStmt = getDb().prepare('UPDATE players SET player_order = ? WHERE id = ? AND team_id = ?');
 
@@ -35,20 +32,17 @@ const playerRepository = {
     },
 
     update(player) {
-        const stmt = getDb().prepare('UPDATE players SET name = ?, number = ?, height = ?, position = ? WHERE id = ?');
-        stmt.run(player.name, player.number, player.height, player.position, player.id);
+        const stmt = getDb().prepare('UPDATE players SET name = ?, number = ?, height = ?, position = ?, photo = ? WHERE id = ?');
+        stmt.run(player.name, player.number, player.height, player.position, player.photo, player.id);
     },
 
     delete(id) {
-        // Primeiro, pegamos o time e a ordem do jogador que será deletado
         const playerToDelete = getDb().prepare('SELECT team_id, player_order FROM players WHERE id = ?').get(id);
-        if (!playerToDelete) return; // Jogador não existe
+        if (!playerToDelete) return;
 
         const transaction = getDb().transaction(() => {
-            // Deleta o jogador
             getDb().prepare('DELETE FROM players WHERE id = ?').run(id);
 
-            // Atualiza a ordem de todos os jogadores que vinham depois dele no mesmo time
             const updateStmt = getDb().prepare(`
                 UPDATE players
                 SET player_order = player_order - 1

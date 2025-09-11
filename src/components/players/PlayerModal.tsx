@@ -10,7 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// <<< NOVO: Importe os componentes do Select
 import {
   Select,
   SelectContent,
@@ -20,7 +19,7 @@ import {
 } from "@/components/ui/select"
 import { User } from "lucide-react";
 
-import type { PlayerProps } from "../../types/TeamPlayersTypes.ts";
+import type { PlayerProps } from "@/types/TeamPlayersTypes.ts";
 
 export type PlayerModalProps = {
   open: boolean;
@@ -30,8 +29,6 @@ export type PlayerModalProps = {
 }
 
 const defaultPlayerState: PlayerProps = { name: '', number: 0, height: '', position: '', photo: '' };
-
-// <<< NOVO: Defina as opções para o Select
 const positions = ["Levantador", "Oposto", "Ponteiro", "Central", "Líbero"];
 
 export function PlayerModal({ open, onClose, player, onSave }: PlayerModalProps) {
@@ -51,7 +48,6 @@ export function PlayerModal({ open, onClose, player, onSave }: PlayerModalProps)
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // <<< NOVO: Handler específico para o Select
   const handlePositionChange = (value: string) => {
     setFormData(prev => ({ ...prev, position: value }));
   };
@@ -115,7 +111,7 @@ export function PlayerModal({ open, onClose, player, onSave }: PlayerModalProps)
             <Label htmlFor="height" className="text-right">Altura</Label>
             <Input id="height" name="height" placeholder="ex: 1.85" value={formData.height} onChange={handleChange} className="col-span-3" />
           </div>
-          {/* <<< MUDANÇA: Substituição do Input pelo Select >>> */}
+
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="position" className="text-right">Posição</Label>
             <Select value={formData.position} onValueChange={handlePositionChange}>

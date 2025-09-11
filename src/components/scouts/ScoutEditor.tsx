@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { PlusCircle } from "lucide-react";
 import { CategoryCard } from './CategoryCard.tsx';
 import { CategoryEditor } from './CategoryEditor.tsx';
-import type { ScoutModel, Category } from '../../types/ScoutTypes.ts';
+import type { ScoutModel, Category } from '@/types/ScoutTypes.ts';
 
 interface ScoutEditorProps {
   initialModel: ScoutModel;
@@ -38,7 +38,6 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
   };
 
   const openCategoryModal = (category: Category | null, index: number | null) => {
-    // Cria uma cópia profunda para evitar mutação direta do estado
     const categoryToEdit: Category = category
       ? JSON.parse(JSON.stringify(category))
       : {
@@ -54,7 +53,6 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
     setModalOpen(true);
   };
 
-  // <<< ALTERADO: Esta função agora é chamada pelo 'onChange' do CategoryEditor >>>
   // Ela atualiza o estado temporário da categoria que está sendo editada no modal.
   const handleCategoryEdit = (updatedCategory: Category) => {
     setEditingCategory(updatedCategory);
@@ -70,13 +68,10 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
       newCategories.push({ ...editingCategory, id: Date.now() });
     }
 
-    // <<< A SOLUÇÃO ESTÁ AQUI >>>
-    // 1. Crie o objeto 'model' completo e atualizado primeiro.
     const updatedModel = { ...model, categories: newCategories };
 
-    // 2. Use este novo objeto para tudo.
-    handleCategoriesChange(newCategories); // Isso ainda é útil para atualizar o estado local se onSave não o fizer
-    onSave(updatedModel); // Envia o modelo correto e atualizado para o banco
+    handleCategoriesChange(newCategories);
+    onSave(updatedModel);
     closeModal();
   };
 
@@ -146,7 +141,6 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
             <DialogTitle>{editingIndex !== null ? 'Editar Categoria' : 'Nova Categoria'}</DialogTitle>
           </DialogHeader>
           {editingCategory && (
-            // <<< ALTERADO: Mapeamento correto das props >>>
             <CategoryEditor
               category={editingCategory}
               onChange={handleCategoryEdit}

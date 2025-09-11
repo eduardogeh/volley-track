@@ -27,7 +27,6 @@ const teamRepository = {
     },
 
     delete(id) {
-        // Graças ao 'ON DELETE CASCADE', os jogadores associados serão removidos automaticamente.
         return getDb().prepare('DELETE FROM teams WHERE id = ?').run(id);
     },
 };

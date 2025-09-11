@@ -30,11 +30,8 @@ export function CategoryCard({ category, onEdit, onDelete }: Props) {
   return (
     <Card className="flex h-[160px] min-w-[200px] max-w-[260px]" style={cardStyle}>
       <CardContent className="flex h-full w-full flex-col p-0">
-
-        {/* <<< ALTERADO: Layout do cabeçalho ajustado para 'justify-between' >>> */}
         <div className="flex h-[30%] items-center justify-between p-2">
           <CardTitle className="text-base font-bold">{category.name}</CardTitle>
-          {/* <<< ALTERADO: Removido o posicionamento absoluto dos botões >>> */}
           <div>
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
               <Pencil className="h-5 w-5" />

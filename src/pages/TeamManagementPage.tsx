@@ -16,25 +16,21 @@ export function TeamManagementPage() {
     const [editingPlayer, setEditingPlayer] = useState<PlayerProps | null>(null);
     const [playerToSwap, setPlayerToSwap] = useState<PlayerProps | null>(null);
 
-    // --- CORREÇÃO no Carregamento Inicial ---
     useEffect(() => {
-        // É preciso usar uma função async dentro do useEffect
         const loadInitialData = async () => {
-            const allTeams = await window.api.team.getAll(); // Espera a Promise resolver
+            const allTeams = await window.api.team.getAll();
             setTeams(allTeams);
 
             if (allTeams && allTeams.length > 0) {
-                // handleSelectTeam também precisa ser async para ser esperado aqui
                 await handleSelectTeam(allTeams[0]);
             }
         };
 
         loadInitialData();
-    }, []); // O array de dependência vazio está correto para carregar apenas uma vez
+    }, []);
 
-    // --- CORREÇÃO nas Funções de Manipulação ---
-    const handleSelectTeam = async (team: Team) => { // -> Adicione 'async'
-        const teamPlayers = await window.api.player.getByTeamId(team.id); // -> Adicione 'await'
+    const handleSelectTeam = async (team: Team) => {
+        const teamPlayers = await window.api.player.getByTeamId(team.id);
         setSelectedTeam(team);
         setPlayers(teamPlayers);
         setPlayerToSwap(null);
@@ -52,7 +48,6 @@ export function TeamManagementPage() {
             await window.api.team.delete(teamToDelete.id);
             const remainingTeams = await refetchTeams();
 
-            // Se o time deletado era o que estava selecionado, limpa a seleção
             if (selectedTeam?.id === teamToDelete.id) {
                 setSelectedTeam(null);
                 setPlayers([]);
@@ -68,27 +63,26 @@ export function TeamManagementPage() {
         const confirmed = window.confirm(`Tem certeza que deseja remover "${playerToDelete.name}"?`);
         if (confirmed) {
             await window.api.player.delete(playerToDelete.id!);
-            await refetchPlayers(); // Recarrega a lista de jogadores do time atual
+            await refetchPlayers();
         }
     };
 
-    const handleTeamUpdate = async (updatedTeam: Team) => { // -> Boa prática: seja consistente com async
-        await window.api.team.update(updatedTeam);
-        // Recarrega a lista para ter certeza que está em sincronia
+    const handleTeamUpdate = async (updatedTeam: Team) => {
+      await window.api.team.update(updatedTeam);
         const allTeams = await window.api.team.getAll();
         setTeams(allTeams);
+        setSelectedTeam(updatedTeam);
     };
 
-    const refetchPlayers = async () => { // -> Adicione 'async'
+    const refetchPlayers = async () => {
         if (selectedTeam) {
-            const updatedPlayers = await window.api.player.getByTeamId(selectedTeam.id); // -> Adicione 'await'
+            const updatedPlayers = await window.api.player.getByTeamId(selectedTeam.id);
             setPlayers(updatedPlayers);
         }
     }
 
     const handlePlayerSwap = (clickedPlayer: PlayerProps) => {
-        // ... (código existente aqui está correto, pois não faz chamadas async diretas, só no final)
-        if (!playerToSwap) {
+      if (!playerToSwap) {
             setPlayerToSwap(clickedPlayer);
         } else {
             if (playerToSwap.id === clickedPlayer.id) {
@@ -115,17 +109,16 @@ export function TeamManagementPage() {
         }
     };
 
-    const handleSavePlayer = async (playerData: PlayerProps) => { // -> Adicione 'async'
+    const handleSavePlayer = async (playerData: PlayerProps) => {
         if (playerData.id) {
             await window.api.player.update(playerData);
         } else {
             await window.api.player.create({ ...playerData, team_id: selectedTeam!.id });
         }
-        await refetchPlayers(); // -> Adicione 'await'
+        await refetchPlayers();
         handleCloseModal();
     };
 
-    // As funções abaixo não precisam ser async pois só manipulam o estado local
     const handleOpenPlayerModal = (player: PlayerProps | null) => {
         setEditingPlayer(player);
         setModalOpen(true);
@@ -136,7 +129,6 @@ export function TeamManagementPage() {
         setEditingPlayer(null);
     };
 
-    // Esta já estava correta
     const handleAddNewTeam = async () => {
         const newTeamId = await window.api.team.create({});
         const allTeams = await window.api.team.getAll();
@@ -175,7 +167,7 @@ export function TeamManagementPage() {
           <div className="flex h-full flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
             {selectedTeam ? (
               <>
-                <TeamEditor team={selectedTeam} onSave={handleTeamUpdate} />
+                <TeamEditor team={selectedTeam} onSave={handleTeamUpdate}/>
                 <div className="flex-grow overflow-y-auto p-2">
                   <PlayerGrid
                     players={players}

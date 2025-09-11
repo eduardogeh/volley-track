@@ -10,7 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx"
 import { Trash2, PlusCircle } from "lucide-react";
-import type { Category, Subcategory } from '../../types/ScoutTypes.ts';
+import type { Category, Subcategory } from '@/types/ScoutTypes.ts';
+import {NumericInput} from "@/components/ui/NumericInput.tsx";
 
 interface CategoryEditorProps {
   category: Category;
@@ -46,9 +47,8 @@ export function CategoryEditor({ category, onChange, onSave, onClose }: Category
   return (
     <div>
       {/* Cabeçalho */}
-      {/* <<< ALTERADO: Layout do cabeçalho usando grid para melhor espaçamento >>> */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-2 items-end">
-        <div className="md:col-span-3"> {/* Nome da Categoria ocupa mais espaço em telas maiores */}
+        <div className="md:col-span-3">
           <Label htmlFor="category-name">Nome da Categoria</Label>
           <Input
             id="category-name"
@@ -64,12 +64,11 @@ export function CategoryEditor({ category, onChange, onSave, onClose }: Category
             type="color"
             value={category.color}
             onChange={(e) => onChange({ ...category, color: e.target.value })}
-            className="h-9 w-full p-1" // 'w-full' para ocupar o espaço disponível
+            className="h-9 w-full p-1"
           />
         </div>
 
-        {/* <<< NOVO: Campos de tempo em uma nova linha com grid >>> */}
-        <div className="grid grid-cols-4 gap-4 md:col-span-5 mt-2"> {/* Ocupa todas as colunas em telas maiores */}
+        <div className="grid grid-cols-4 gap-4 md:col-span-5 mt-2">
           <div>
             <Label htmlFor="clip-before">Clip Antes (s)</Label>
             <Input
@@ -92,22 +91,23 @@ export function CategoryEditor({ category, onChange, onSave, onClose }: Category
       </div>
 
       {/* Seção de Sub-categorias */}
-      {/* Seção de Sub-categorias */}
       <div className="mt-6">
         <h4 className="mb-2 text-sm font-medium text-muted-foreground">Sub-categorias</h4>
 
         {/* Cabeçalho da lista de subcategorias */}
-        <div className="mb-1 flex items-end gap-2 pr-10"> {/* pr-10 para alinhar com o botão de deletar */}
-          <div className="flex-grow">
-            <Label className="text-xs font-normal text-muted-foreground">Nome</Label>
+        {category.subcategories.length > 0 && (
+          <div className="mb-1 flex items-end gap-2 pr-10">
+            <div className="flex-grow">
+              <Label className="text-xs font-normal text-muted-foreground">Nome</Label>
+            </div>
+            <div className="w-[180px] shrink-0">
+              <Label className="text-xs font-normal text-muted-foreground">Tipo</Label>
+            </div>
+            <div className="w-24 shrink-0">
+              <Label className="text-xs font-normal text-muted-foreground">Peso</Label>
+            </div>
           </div>
-          <div className="w-[180px] shrink-0">
-            <Label className="text-xs font-normal text-muted-foreground">Tipo</Label>
-          </div>
-          <div className="w-24 shrink-0">
-            <Label className="text-xs font-normal text-muted-foreground">Peso</Label>
-          </div>
-        </div>
+        )}
 
         {category.subcategories.map((sub, index) => (
           <div key={sub.id} className="mb-2 flex items-end gap-2">
@@ -136,13 +136,11 @@ export function CategoryEditor({ category, onChange, onSave, onClose }: Category
             </div>
 
             <div className="w-24 shrink-0">
-              <Input
+              <NumericInput
                 id={`sub-weight-${sub.id}`}
                 placeholder="Peso"
-                type="number"
-                step="0.1"
-                value={sub.weight}
-                onChange={(e) => handleSubcategoryChange(index, 'weight', e.target.value)}
+                value={sub.weight || 0}
+                onChange={(numericValue) => handleSubcategoryChange(index, 'weight', numericValue)}
               />
             </div>
 

@@ -1,6 +1,5 @@
-// electron/database/connection.cjs
 const Database = require('better-sqlite3');
-let db; // A variável da conexão fica aqui, mas não é inicializada ainda.
+let db;
 
 /**
  * Inicializa a conexão com o banco de dados.
@@ -86,5 +85,4 @@ function setupSchema() {
     console.log('Schema do banco de dados verificado/configurado.');
 }
 
-// Em vez de exportar 'db', exportamos as funções de gerenciamento.
 module.exports = { initDatabase, getDb };

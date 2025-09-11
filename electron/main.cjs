@@ -1,10 +1,8 @@
 const { app, BrowserWindow, ipcMain, ipcRenderer} = require('electron');
 const path = require('path');
 
-// Importa a função de inicialização do banco
 const { initDatabase } = require('./database/connection.cjs');
 
-// Importa os repositórios
 const teamRepository = require('./database/teamRepository.cjs');
 const playerRepository = require('./database/playerRepository.cjs');
 const scoutRepository = require('./database/scoutRepository.cjs');
@@ -29,7 +27,6 @@ function createWindow() {
 }
 
 // ------------------ IPC ------------------
-// (seus handlers continuam iguais)
 ipcMain.handle('teams:getAll', () => teamRepository.getAll());
 ipcMain.handle('teams:update', (event, team) => teamRepository.update(team));
 ipcMain.handle('teams:create', (event, team) => teamRepository.create(team));
@@ -47,13 +44,9 @@ ipcMain.handle('scout:delete', (event, id) => scoutRepository.delete(id));
 
 // ------------------ Inicialização ------------------
 app.whenReady().then(() => {
-    // Defina o caminho para o banco em uma pasta gravável
     const dbPath = path.join(app.getPath('userData'), 'volley-track.sqlite');
 
-    // Inicializa o banco com schema
     initDatabase(dbPath);
-
-    // Cria a janela principal
     createWindow();
 });
 

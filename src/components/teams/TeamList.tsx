@@ -1,11 +1,10 @@
 import 'react';
-// Importe os componentes e ícones necessários
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlusCircle, Trash2, Shield } from "lucide-react";
-import { cn } from "@/lib/utils"; // Utilitário para classes condicionais
+import { cn } from "@/lib/utils";
 
-import type { Team } from "../../types/TeamPlayersTypes.ts";
+import type { Team } from "@/types/TeamPlayersTypes.ts";
 
 export interface TeamListProps {
   teams: Team[];
@@ -18,12 +17,11 @@ export interface TeamListProps {
 export function TeamList({ teams, selectedTeamId, onSelectTeam, onAddTeam, onDeleteTeam }: TeamListProps) {
 
   const handleDeleteClick = (e: React.MouseEvent, team: Team) => {
-    e.stopPropagation(); // Impede que o clique no ícone de lixo selecione o time
+    e.stopPropagation();
     onDeleteTeam(team);
   };
 
   return (
-    // Container principal (substitui o Paper)
     <div className="flex h-full flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
       {/* Cabeçalho */}
       <div className="flex items-center justify-between border-b p-4">
@@ -66,7 +64,6 @@ export function TeamList({ teams, selectedTeamId, onSelectTeam, onAddTeam, onDel
             ))}
           </div>
         ) : (
-          // Mensagem de "nenhuma equipe"
           <div className="flex h-full items-center justify-center p-4">
             <p className="text-sm text-muted-foreground">
               Nenhuma equipe encontrada.

@@ -12,5 +12,5 @@ export interface PlayerProps {
     number?: number;
     height?: string;
     position: string;
-    photo?: string; // Base64 encoded image
+    photo?: string;
 }

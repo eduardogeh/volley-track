@@ -1,9 +1,5 @@
-// preload.cjs (versão final)
-
 const { contextBridge, ipcRenderer } = require('electron');
 
-// Expõe um objeto 'api' para o front-end, onde cada função
-// simplesmente invoca o handler correspondente no processo principal.
 contextBridge.exposeInMainWorld('api', {
     team: {
         getAll: () => ipcRenderer.invoke('teams:getAll'),

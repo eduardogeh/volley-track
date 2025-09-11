@@ -1,10 +1,8 @@
-// src/types/ScoutModelTypes.ts
-
 export type Subcategory = {
     id?: number;
     name: string;
-    type: string; // "resultado", "zona", "tipo", etc.
-    weight?: number; // Peso da subcategoria
+    type: string;
+    weight?: number;
 };
 
 export type Category = {

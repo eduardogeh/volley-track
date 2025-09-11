@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-// <<< NOVO: Importe o ícone de lixeira >>>
 import { ArrowLeft, PlusCircle, Trash2 } from "lucide-react";
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -12,12 +11,10 @@ export function ScoutsPage() {
   const [scouts, setScouts] = useState<ScoutModel[]>([]);
   const [selectedScout, setSelectedScout] = useState<ScoutModel | null>(null);
 
-  // <<< ALTERADO: Carregamento inicial busca os dados do banco >>>
   useEffect(() => {
     const loadScouts = async () => {
       const allScouts = await window.api.scout.getAll();
       setScouts(allScouts);
-      // Seleciona o primeiro scout da lista por padrão
       if (allScouts.length > 0) {
         setSelectedScout(allScouts[0]);
       }
@@ -35,16 +32,14 @@ export function ScoutsPage() {
       return;
     }
 
-    // Tenta encontrar o scout pelo ID, senão seleciona o primeiro
     const scoutToSelect = allScouts.find(s => s.id === scoutIdToSelect) || allScouts[0];
     setSelectedScout(scoutToSelect);
   };
 
-  // <<< ALTERADO: Cria um novo scout no banco de dados >>>
   const handleAddNewScout = async () => {
     const newScout: Partial<ScoutModel> = {
       name: 'Novo Scout',
-      grid_width: 4, // Valor padrão de colunas
+      grid_width: 4,
       categories: [],
     };
 
@@ -52,23 +47,18 @@ export function ScoutsPage() {
     await refetchAndSelectScout(newScoutId);
   };
 
-  // <<< ALTERADO: Atualiza o scout selecionado no banco de dados >>>
   const handleUpdateScout = async (scoutToSave: ScoutModel) => {
     await window.api.scout.save(scoutToSave);
-    // Recarrega os dados para garantir que a lista lateral seja atualizada (ex: se o nome mudou)
     await refetchAndSelectScout(scoutToSave.id);
   };
 
-  // <<< NOVO: Deleta um scout do banco de dados >>>
   const handleDeleteScout = async (scoutToDelete: ScoutModel) => {
     const confirmed = window.confirm(`Tem certeza que deseja excluir o scout "${scoutToDelete.name}"?`);
     if (confirmed && scoutToDelete.id) {
       await window.api.scout.delete(scoutToDelete.id);
-      // Se o scout deletado era o selecionado, refaz a busca e seleciona o primeiro da lista
       if (selectedScout?.id === scoutToDelete.id) {
         await refetchAndSelectScout();
       } else {
-        // Senão, apenas refaz a busca mantendo a seleção atual
         await refetchAndSelectScout(selectedScout?.id);
       }
     }
@@ -94,7 +84,6 @@ export function ScoutsPage() {
             </div>
             <div className="flex-grow overflow-y-auto p-1">
               {scouts.map((scout) => (
-                // <<< NOVO: Container para agrupar o nome e o botão de deletar >>>
                 <div key={scout.id} className="group flex items-center gap-1 rounded-md pr-1 transition-colors hover:bg-accent">
                   <button
                     onClick={() => setSelectedScout(scout)}
@@ -124,7 +113,7 @@ export function ScoutsPage() {
           <div className="h-full overflow-y-auto rounded-lg border bg-card text-card-foreground shadow-sm">
             {selectedScout ? (
               <ScoutEditor
-                key={selectedScout.id} // Chave é importante para o React recriar o componente ao trocar de scout
+                key={selectedScout.id}
                 initialModel={selectedScout}
                 onSave={handleUpdateScout}
               />

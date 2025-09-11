@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-// Importe os componentes do shadcn/ui
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield } from "lucide-react"; // Um ícone para o fallback da logo
+import { Shield } from "lucide-react";
 
-import type { Team } from "../../types/TeamPlayersTypes.ts";
+import type { Team } from "@/types/TeamPlayersTypes.ts";
 
 export function TeamEditor({ team, onSave }: { team: Team | null, onSave?: (team: Team) => void }) {
   const [editedTeam, setEditedTeam] = useState<Team | null>(team);
@@ -16,7 +15,6 @@ export function TeamEditor({ team, onSave }: { team: Team | null, onSave?: (team
     setEditedTeam(team);
   }, [team]);
 
-  // As lógicas de estado e manipulação de eventos permanecem as mesmas
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setEditedTeam(prevTeam => prevTeam ? { ...prevTeam, [name]: value } : null);
@@ -42,7 +40,6 @@ export function TeamEditor({ team, onSave }: { team: Team | null, onSave?: (team
   if (!editedTeam) return null;
 
   return (
-    // Container principal com Tailwind CSS
     <div className="flex items-center gap-6 border-b p-4">
       {/* Seção da Logo clicável */}
       <div onClick={() => logoInputRef.current?.click()} className="cursor-pointer">
@@ -57,7 +54,7 @@ export function TeamEditor({ team, onSave }: { team: Team | null, onSave?: (team
           ref={logoInputRef}
           onChange={handleLogoChange}
           accept="image/*"
-          className="hidden" // Classe do Tailwind para esconder o input
+          className="hidden"
         />
       </div>
 
@@ -81,7 +78,6 @@ export function TeamEditor({ team, onSave }: { team: Team | null, onSave?: (team
           name="color"
           value={editedTeam.color}
           onChange={handleChange}
-          // Estilização do seletor de cor com Tailwind
           className="h-12 w-12 cursor-pointer rounded-md border-0 bg-transparent p-0"
         />
       </div>
