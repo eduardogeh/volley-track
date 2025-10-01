@@ -81,6 +81,18 @@ function setupSchema() {
             weight REAL NOT NULL DEFAULT 0,
             FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
         );
+
+        CREATE TABLE IF NOT EXISTS projects (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            season TEXT NOT NULL,
+            tournament TEXT NOT NULL,
+            description TEXT,
+            id_team INTEGER NOT NULL,
+            id_scout_model INTEGER NOT NULL,
+            video_path TEXT,
+            FOREIGN KEY (id_team) REFERENCES teams (id) ON DELETE CASCADE,
+            FOREIGN KEY (id_scout_model) REFERENCES scout_models (id) ON DELETE CASCADE
+        );
     `);
     console.log('Schema do banco de dados verificado/configurado.');
 }

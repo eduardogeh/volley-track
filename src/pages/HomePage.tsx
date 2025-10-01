@@ -2,7 +2,6 @@ import 'react';
 import { Button } from "@/components/ui/button";
 
 import {
-  PlusCircle,
   Folder,
   Users,
   LineChart,
@@ -20,14 +19,12 @@ export function HomePage() {
 
       {/* Grid de botões */}
       <div className="grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-        <Button size="lg" disabled>
-          <PlusCircle className="mr-2 h-5 w-5" />
-          Novo Projeto
-        </Button>
 
-        <Button size="lg" disabled>
-          <Folder className="mr-2 h-5 w-5" />
-          Projetos
+        <Button asChild size="lg">
+          <RouterLink to='/projects' >
+            <Folder className="mr-2 h-5 w-5" />
+            Projetos
+          </RouterLink>
         </Button>
 
         <Button asChild size="lg">

@@ -16,7 +16,22 @@ contextBridge.exposeInMainWorld('api', {
     },
     scout: {
         getAll: () => ipcRenderer.invoke('scout:getAll'),
+        getById: (id) => ipcRenderer.invoke('scout:getById', id),
         save: (model) => ipcRenderer.invoke('scout:save', model),
         delete: (id) => ipcRenderer.invoke('scout:delete', id),
     },
+    project: {
+        getAll: () => ipcRenderer.invoke('projects:getAll'),
+        getById: (id) => ipcRenderer.invoke('projects:getById', id),
+        create: (project) => ipcRenderer.invoke('projects:create', project),
+        update: (project) => ipcRenderer.invoke('projects:update', project),
+        delete: (projectId) => ipcRenderer.invoke('projects:delete', projectId),
+    },
+    dialog: {
+        openFile: () => ipcRenderer.invoke('dialog:openFile'),
+    },
+    fileToUrl: {
+        convert: (filePath) => ipcRenderer.sendSync('file:toUrl', filePath),
+    },
+    getMediaServerUrl: () => ipcRenderer.invoke('get-media-server-url'),
 });

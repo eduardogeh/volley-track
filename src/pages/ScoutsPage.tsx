@@ -6,6 +6,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { ScoutEditor } from '../components/scouts/ScoutEditor.tsx';
 import type { ScoutModel } from '../types/ScoutTypes';
+import {toast} from "sonner";
 
 export function ScoutsPage() {
   const [scouts, setScouts] = useState<ScoutModel[]>([]);
@@ -37,29 +38,47 @@ export function ScoutsPage() {
   };
 
   const handleAddNewScout = async () => {
-    const newScout: Partial<ScoutModel> = {
-      name: 'Novo Scout',
-      grid_width: 4,
-      categories: [],
-    };
-
-    const newScoutId = await window.api.scout.save(newScout);
-    await refetchAndSelectScout(newScoutId);
+    try {
+      const newScout: Partial<ScoutModel> = {
+        name: 'Novo Scout',
+        grid_width: 4,
+        grid_height: 3,
+        categories: [],
+      };
+      const newScoutId = await window.api.scout.save(newScout);
+      await refetchAndSelectScout(newScoutId);
+      toast.success("Novo scout criado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao criar novo scout:", error);
+      toast.error("Não foi possível criar o scout.");
+    }
   };
 
   const handleUpdateScout = async (scoutToSave: ScoutModel) => {
-    await window.api.scout.save(scoutToSave);
-    await refetchAndSelectScout(scoutToSave.id);
+    try {
+      await window.api.scout.save(scoutToSave);
+      await refetchAndSelectScout(scoutToSave.id);
+      toast.success(`Scout "${scoutToSave.name}" salvo com sucesso!`);
+    } catch (error) {
+      console.error("Erro ao salvar o scout:", error);
+      toast.error("Não foi possível salvar as alterações.");
+    }
   };
 
   const handleDeleteScout = async (scoutToDelete: ScoutModel) => {
     const confirmed = window.confirm(`Tem certeza que deseja excluir o scout "${scoutToDelete.name}"?`);
     if (confirmed && scoutToDelete.id) {
-      await window.api.scout.delete(scoutToDelete.id);
-      if (selectedScout?.id === scoutToDelete.id) {
-        await refetchAndSelectScout();
-      } else {
-        await refetchAndSelectScout(selectedScout?.id);
+      try {
+        await window.api.scout.delete(scoutToDelete.id);
+        if (selectedScout?.id === scoutToDelete.id) {
+          await refetchAndSelectScout();
+        } else {
+          await refetchAndSelectScout(selectedScout?.id);
+        }
+        toast.success(`Scout "${scoutToDelete.name}" excluído.`);
+      } catch (error) {
+        console.error("Erro ao excluir o scout:", error);
+        toast.error("Não foi possível excluir o scout.");
       }
     }
   };

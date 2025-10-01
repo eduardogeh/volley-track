@@ -7,6 +7,7 @@ import { PlayerGrid } from '../components/players/PlayerGrid.tsx';
 import type { PlayerProps, Team } from "../types/TeamPlayersTypes.ts";
 import { PlayerModal } from "../components/players/PlayerModal.tsx";
 import { TeamList } from '../components/teams/TeamList.tsx';
+import {toast} from "sonner";
 
 export function TeamManagementPage() {
     const [teams, setTeams] = useState<Team[]>([]);
@@ -42,37 +43,56 @@ export function TeamManagementPage() {
         return allTeams;
     };
 
-    const handleDeleteTeam = async (teamToDelete: Team) => {
-        const confirmed = window.confirm(`Tem certeza que deseja remover a equipe "${teamToDelete.name}"? Todos os seus jogadores serão perdidos.`);
-        if (confirmed) {
-            await window.api.team.delete(teamToDelete.id);
-            const remainingTeams = await refetchTeams();
+  const handleDeleteTeam = async (teamToDelete: Team) => {
+    const confirmed = window.confirm(`Tem certeza que deseja remover a equipe "${teamToDelete.name}"? Todos os seus jogadores serão perdidos.`);
+    if (confirmed) {
+      // <<< 2. ADICIONE TRY...CATCH E TOASTS >>>
+      try {
+        await window.api.team.delete(teamToDelete.id);
+        const remainingTeams = await refetchTeams();
 
-            if (selectedTeam?.id === teamToDelete.id) {
-                setSelectedTeam(null);
-                setPlayers([]);
-            }
-            setTeams(remainingTeams)
-            if (remainingTeams.length > 0 && !selectedTeam) {
-                await handleSelectTeam(remainingTeams[0]);
-            }
+        if (selectedTeam?.id === teamToDelete.id) {
+          setSelectedTeam(null);
+          setPlayers([]);
         }
-    };
-
-    const handleDeletePlayer = async (playerToDelete: PlayerProps) => {
-        const confirmed = window.confirm(`Tem certeza que deseja remover "${playerToDelete.name}"?`);
-        if (confirmed) {
-            await window.api.player.delete(playerToDelete.id!);
-            await refetchPlayers();
+        setTeams(remainingTeams)
+        if (remainingTeams.length > 0 && !selectedTeam) {
+          await handleSelectTeam(remainingTeams[0]);
         }
-    };
+        toast.success(`Equipe "${teamToDelete.name}" removida com sucesso!`);
+      } catch (error) {
+        console.error("Erro ao remover equipe:", error);
+        toast.error("Não foi possível remover a equipe.");
+      }
+    }
+  };
 
-    const handleTeamUpdate = async (updatedTeam: Team) => {
+  const handleDeletePlayer = async (playerToDelete: PlayerProps) => {
+    const confirmed = window.confirm(`Tem certeza que deseja remover "${playerToDelete.name}"?`);
+    if (confirmed) {
+      try {
+        await window.api.player.delete(playerToDelete.id!);
+        await refetchPlayers();
+        toast.success(`Jogador "${playerToDelete.name}" removido.`);
+      } catch (error) {
+        console.error("Erro ao remover jogador:", error);
+        toast.error("Não foi possível remover o jogador.");
+      }
+    }
+  };
+
+  const handleTeamUpdate = async (updatedTeam: Team) => {
+    try {
       await window.api.team.update(updatedTeam);
-        const allTeams = await window.api.team.getAll();
-        setTeams(allTeams);
-        setSelectedTeam(updatedTeam);
-    };
+      const allTeams = await window.api.team.getAll();
+      setTeams(allTeams);
+      setSelectedTeam(updatedTeam);
+      toast.success("Equipe salva com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar equipe:", error);
+      toast.error("Não foi possível salvar a equipe.");
+    }
+  };
 
     const refetchPlayers = async () => {
         if (selectedTeam) {
@@ -109,15 +129,22 @@ export function TeamManagementPage() {
         }
     };
 
-    const handleSavePlayer = async (playerData: PlayerProps) => {
-        if (playerData.id) {
-            await window.api.player.update(playerData);
-        } else {
-            await window.api.player.create({ ...playerData, team_id: selectedTeam!.id });
-        }
-        await refetchPlayers();
-        handleCloseModal();
-    };
+  const handleSavePlayer = async (playerData: PlayerProps) => {
+    const isUpdating = !!playerData.id;
+    try {
+      if (isUpdating) {
+        await window.api.player.update(playerData);
+      } else {
+        await window.api.player.create({ ...playerData, team_id: selectedTeam!.id });
+      }
+      await refetchPlayers();
+      handleCloseModal();
+      toast.success(isUpdating ? "Jogador atualizado!" : "Jogador criado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar jogador:", error);
+      toast.error("Não foi possível salvar o jogador.");
+    }
+  };
 
     const handleOpenPlayerModal = (player: PlayerProps | null) => {
         setEditingPlayer(player);
@@ -129,15 +156,21 @@ export function TeamManagementPage() {
         setEditingPlayer(null);
     };
 
-    const handleAddNewTeam = async () => {
-        const newTeamId = await window.api.team.create({});
-        const allTeams = await window.api.team.getAll();
-        setTeams(allTeams);
-        const newTeam = allTeams.find(t => t.id === newTeamId);
-        if (newTeam) {
-            await handleSelectTeam(newTeam);
-        }
-    };
+  const handleAddNewTeam = async () => {
+    try {
+      const newTeamId = await window.api.team.create({});
+      const allTeams = await window.api.team.getAll();
+      setTeams(allTeams);
+      const newTeam = allTeams.find(t => t.id === newTeamId);
+      if (newTeam) {
+        await handleSelectTeam(newTeam);
+      }
+      toast.success("Nova equipe adicionada!");
+    } catch(error) {
+      console.error("Erro ao criar nova equipe:", error);
+      toast.error("Não foi possível adicionar uma nova equipe.");
+    }
+  };
 
   return (
     <main className="box-border h-screen w-screen p-2 pt-16">
