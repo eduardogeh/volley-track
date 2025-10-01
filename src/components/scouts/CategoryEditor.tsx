@@ -31,7 +31,7 @@ export function CategoryEditor({ category, onChange, onSave, onClose }: Category
 
   const handleAddSubcategory = () => {
     const newSubcategory: Subcategory = {
-      id: Date.now(),
+      id: undefined,
       name: '',
       type: 'resultado',
       weight: 0,
@@ -110,10 +110,10 @@ export function CategoryEditor({ category, onChange, onSave, onClose }: Category
         )}
 
         {category.subcategories.map((sub, index) => (
-          <div key={sub.id} className="mb-2 flex items-end gap-2">
+          <div key={sub.id || index} className="mb-2 flex items-end gap-2">
             <div className="flex-grow">
               <Input
-                id={`sub-name-${sub.id}`}
+                id={`sub-name-${sub.id || index}`}
                 placeholder="Nome"
                 value={sub.name}
                 onChange={(e) => handleSubcategoryChange(index, 'name', e.target.value)}
@@ -125,7 +125,7 @@ export function CategoryEditor({ category, onChange, onSave, onClose }: Category
                 value={sub.type}
                 onValueChange={(value) => handleSubcategoryChange(index, 'type', value)}
               >
-                <SelectTrigger id={`sub-type-${sub.id}`} className="w-full">
+                <SelectTrigger id={`sub-type-${sub.id || index}`} className="w-full">
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -137,7 +137,7 @@ export function CategoryEditor({ category, onChange, onSave, onClose }: Category
 
             <div className="w-24 shrink-0">
               <NumericInput
-                id={`sub-weight-${sub.id}`}
+                id={`sub-weight-${sub.id || index}`}
                 placeholder="Peso"
                 value={sub.weight || 0}
                 onChange={(numericValue) => handleSubcategoryChange(index, 'weight', numericValue)}

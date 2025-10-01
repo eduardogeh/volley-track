@@ -51,6 +51,7 @@ const scoutRepository = {
      */
     save: (model) => {
         const db = getDb();
+        console.log('Salvando modelo de scout:', JSON.stringify(model, null, 2));
         const transaction = db.transaction((modelData) => {
             let modelId = modelData.id;
 

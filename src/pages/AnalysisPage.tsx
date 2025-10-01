@@ -135,33 +135,38 @@ export function AnalysisPage() {
   }
 
   return (
-    <main className="h-screen w-screen p-2 pt-16 flex flex-col">
-      <Button asChild className="absolute left-4 top-4 z-10">
-        <RouterLink to="/projects">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Voltar para Projetos
-        </RouterLink>
-      </Button>
+    <main className="h-screen w-screen p-4 flex flex-col">
+      {/* O botão e o título foram removidos daqui */}
 
-      {/* Título da página */}
-      <div className="mb-4 shrink-0">
-        <h1 className="text-2xl font-bold">{project.tournament} - {project.season}</h1>
-      </div>
-
-      {/* Container principal que empilha a linha de cima e a de baixo */}
+      {/* ###################################################### */}
+      {/* <<< CONTAINER PRINCIPAL COM O LAYOUT FINAL >>> */}
+      {/* ###################################################### */}
       <div className="flex-grow flex flex-col gap-4 overflow-hidden">
 
-        {/* --- LINHA SUPERIOR: Sidebar e Vídeo --- */}
-        {/* Damos a esta linha 60% da altura e impedimos que ela encolha */}
+        {/* --- LINHA SUPERIOR: Sidebar com cabeçalho e Vídeo --- */}
         <div className="h-3/5 shrink-0 flex flex-row gap-4">
 
-          {/* Coluna da Esquerda: Sidebar de Ações */}
-          {/* h-full faz ela ocupar os 60% da altura da linha superior */}
-          <aside className="w-[350px] h-full shrink-0">
-            <ScoutedEventsSidebar events={scoutedEvents} onEventClick={handleEventClick} />
+          {/* COLUNA DA ESQUERDA: Agora um container flex-col para o cabeçalho e a lista */}
+          <aside className="w-[350px] h-full shrink-0 flex flex-col gap-4">
+
+            {/* 1. CABEÇALHO MOVIDO PARA DENTRO DA SIDEBAR */}
+            <div className="shrink-0">
+              <Button asChild variant="outline" className="mb-4">
+                <RouterLink to="/projects">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Voltar para Projetos
+                </RouterLink>
+              </Button>
+              <h1 className="text-2xl font-bold">{project.tournament} - {project.season}</h1>
+            </div>
+
+            {/* 2. LISTA DE AÇÕES OCUPA O ESPAÇO RESTANTE DA SIDEBAR */}
+            <div className="flex-grow overflow-hidden">
+              <ScoutedEventsSidebar events={scoutedEvents} onEventClick={handleEventClick} />
+            </div>
           </aside>
 
-          {/* Coluna da Direita: Vídeo Player */}
+          {/* COLUNA DA DIREITA: Vídeo Player (começa do topo da linha) */}
           <section className="flex-grow h-full bg-card rounded-lg p-4">
             {videoUrl ? (
               <VideoPlayer
@@ -176,8 +181,7 @@ export function AnalysisPage() {
           </section>
         </div>
 
-        {/* --- LINHA INFERIOR: Ferramentas de Scout --- */}
-        {/* 'flex-grow' faz esta seção ocupar os 40% restantes da altura */}
+        {/* --- LINHA INFERIOR: Ferramentas de Scout (continua igual) --- */}
         <div className="flex-grow rounded-lg border bg-card text-card-foreground shadow-sm p-4 flex flex-col overflow-hidden">
           <h2 className="font-semibold text-lg mb-4 shrink-0">Ferramentas de Scout ({scoutModel?.name})</h2>
           <div className="overflow-x-auto pb-4">
@@ -197,7 +201,7 @@ export function AnalysisPage() {
 
       </div>
 
-      {/* O Modal não muda e continua fora do layout principal */}
+      {/* O Modal não muda */}
       {currentScoutEvent && (
         <PlayerSelectionModal
           isOpen={isModalOpen}

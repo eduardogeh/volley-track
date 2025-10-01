@@ -41,7 +41,7 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
     const categoryToEdit: Category = category
       ? JSON.parse(JSON.stringify(category))
       : {
-      id: Date.now(),
+      id: undefined,
         name: 'Nova Categoria',
         subcategories: [],
         color: '#cccccc',
@@ -65,7 +65,7 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
     if (editingIndex !== null) {
       newCategories[editingIndex] = editingCategory;
     } else {
-      newCategories.push({ ...editingCategory, id: Date.now() });
+      newCategories.push({ ...editingCategory });
     }
 
     const updatedModel = { ...model, categories: newCategories };
