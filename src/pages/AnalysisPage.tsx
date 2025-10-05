@@ -135,58 +135,61 @@ export function AnalysisPage() {
   }
 
   return (
-    <main className="h-screen w-screen p-4 flex flex-col">
-      {/* O botão e o título foram removidos daqui */}
+    <main className="h-screen w-screen p-4 flex flex-row gap-4">
+      {/* O layout principal agora é uma linha horizontal (flex-row) */}
 
       {/* ###################################################### */}
-      {/* <<< CONTAINER PRINCIPAL COM O LAYOUT FINAL >>> */}
+      {/* <<< COLUNA DA ESQUERDA: SIDEBAR COMPLETA >>> */}
       {/* ###################################################### */}
-      <div className="flex-grow flex flex-col gap-4 overflow-hidden">
+      <aside className="w-[350px] h-full shrink-0 flex flex-col gap-4">
 
-        {/* --- LINHA SUPERIOR: Sidebar com cabeçalho e Vídeo --- */}
-        <div className="h-3/5 shrink-0 flex flex-row gap-4">
-
-          {/* COLUNA DA ESQUERDA: Agora um container flex-col para o cabeçalho e a lista */}
-          <aside className="w-[350px] h-full shrink-0 flex flex-col gap-4">
-
-            {/* 1. CABEÇALHO MOVIDO PARA DENTRO DA SIDEBAR */}
-            <div className="shrink-0">
-              <Button asChild variant="outline" className="mb-4">
-                <RouterLink to="/projects">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Voltar para Projetos
-                </RouterLink>
-              </Button>
-              <h1 className="text-2xl font-bold">{project.tournament} - {project.season}</h1>
-            </div>
-
-            {/* 2. LISTA DE AÇÕES OCUPA O ESPAÇO RESTANTE DA SIDEBAR */}
-            <div className="flex-grow overflow-hidden">
-              <ScoutedEventsSidebar events={scoutedEvents} onEventClick={handleEventClick} />
-            </div>
-          </aside>
-
-          {/* COLUNA DA DIREITA: Vídeo Player (começa do topo da linha) */}
-          <section className="flex-grow h-full bg-card rounded-lg p-4">
-            {videoUrl ? (
-              <VideoPlayer
-                ref={videoPlayerRef}
-                src={videoUrl}
-              />
-            ) : (
-              <div className="flex items-center justify-center w-full h-full bg-muted rounded-md">
-                <p className="text-muted-foreground">Caminho do vídeo não encontrado.</p>
-              </div>
-            )}
-          </section>
+        {/* Cabeçalho da Sidebar */}
+        <div className="shrink-0">
+          <Button asChild variant="outline" className="mb-4">
+            <RouterLink to="/projects">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar para Projetos
+            </RouterLink>
+          </Button>
+          <h1 className="text-2xl font-bold">{project.tournament} - {project.season}</h1>
         </div>
 
-        {/* --- LINHA INFERIOR: Ferramentas de Scout (continua igual) --- */}
-        <div className="flex-grow rounded-lg border bg-card text-card-foreground shadow-sm p-4 flex flex-col overflow-hidden">
-          <h2 className="font-semibold text-lg mb-4 shrink-0">Ferramentas de Scout ({scoutModel?.name})</h2>
-          <div className="overflow-x-auto pb-4">
+        {/* Lista de Ações (ocupa o espaço restante da sidebar) */}
+        <div className="flex-grow overflow-hidden">
+          <ScoutedEventsSidebar events={scoutedEvents} onEventClick={handleEventClick} />
+        </div>
+      </aside>
+
+      {/* ###################################################### */}
+      {/* <<< COLUNA DA DIREITA: VÍDEO E FERRAMENTAS >>> */}
+      {/* ###################################################### */}
+      <section className="flex-grow h-full flex flex-col gap-4 overflow-hidden">
+
+        {/* ÁREA DO VÍDEO */}
+        {/* 'flex-grow' faz o vídeo ocupar o espaço vertical, respeitando a altura fixa das ferramentas abaixo */}
+        <div className="w-full bg-card rounded-lg p-4 flex-grow overflow-hidden">
+          {videoUrl ? (
+            <VideoPlayer
+              ref={videoPlayerRef}
+              src={videoUrl}
+            />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full bg-muted rounded-md">
+              <p className="text-muted-foreground">Caminho do vídeo não encontrado.</p>
+            </div>
+          )}
+        </div>
+
+        {/* --- ÁREA DAS FERRAMENTAS DE SCOUT --- */}
+        <div className="h-[280px] shrink-0 rounded-lg border bg-card text-card-foreground shadow-sm p-4 flex flex-col overflow-hidden">
+          <div className="overflow-y-auto pb-4">
             {scoutModel && (
-              <div className="grid auto-cols-max grid-flow-col gap-4">
+              <div
+                className="grid justify-start gap-4"
+                style={{
+                  gridTemplateColumns: `repeat(${scoutModel.grid_width}, min-content)`
+                }}
+              >
                 {scoutModel.categories.map((category) => (
                   <InteractiveCategoryCard
                     key={category.id}
@@ -198,10 +201,8 @@ export function AnalysisPage() {
             )}
           </div>
         </div>
+      </section>
 
-      </div>
-
-      {/* O Modal não muda */}
       {currentScoutEvent && (
         <PlayerSelectionModal
           isOpen={isModalOpen}
