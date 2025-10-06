@@ -1,6 +1,5 @@
 const { app, BrowserWindow, ipcMain, dialog, protocol } = require('electron'); // <<< A MUDANÇA ESTÁ AQUI
 const path = require('path');
-const url = require('url');
 const express = require('express');
 const getPort = require('get-port');
 
@@ -11,14 +10,12 @@ const teamRepository = require('./database/teamRepository.cjs');
 const playerRepository = require('./database/playerRepository.cjs');
 const scoutRepository = require('./database/scoutRepository.cjs');
 const projectRepository = require('./database/projectRepository.cjs');
+const playerActionRepository = require('./database/playerActionRepository.cjs');
 
 
 async function startMediaServer() {
     const server = express();
 
-    // <<< A CORREÇÃO ESTÁ AQUI: USANDO UMA EXPRESSÃO REGULAR >>>
-    // Esta RegExp corresponde a '/media/' seguido por um ou mais caracteres (.+),
-    // que são capturados no primeiro grupo ().
     server.get(/\/media\/(.+)/, (req, res) => {
         try {
             // O caminho capturado estará em req.params[0]
@@ -85,18 +82,8 @@ ipcMain.handle('projects:create', (event, project) => projectRepository.create(p
 ipcMain.handle('projects:update', (event, project) => projectRepository.update(project));
 ipcMain.handle('projects:delete', (event, projectId) => projectRepository.delete(projectId));
 
-ipcMain.handle('dialog:openFile', async () => {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
-        properties: ['openFile'],
-        filters: [
-            { name: 'Videos', extensions: ['mp4', 'mov', 'avi', 'mkv'] }
-        ]
-    });
-    if (!canceled) {
-        return filePaths[0];
-    }
-    return null;
-});
+ipcMain.handle('player-actions:create', (event, action) => playerActionRepository.create(action));
+ipcMain.handle('player-actions:getByProjectId', (event, projectId) => playerActionRepository.getByProjectId(projectId));
 
 // ------------------ Inicialização ------------------
 app.whenReady().then(async () => {

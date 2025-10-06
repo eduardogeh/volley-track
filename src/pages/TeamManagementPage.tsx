@@ -46,7 +46,6 @@ export function TeamManagementPage() {
   const handleDeleteTeam = async (teamToDelete: Team) => {
     const confirmed = window.confirm(`Tem certeza que deseja remover a equipe "${teamToDelete.name}"? Todos os seus jogadores serão perdidos.`);
     if (confirmed) {
-      // <<< 2. ADICIONE TRY...CATCH E TOASTS >>>
       try {
         await window.api.team.delete(teamToDelete.id);
         const remainingTeams = await refetchTeams();
@@ -184,7 +183,6 @@ export function TeamManagementPage() {
       <PlayerModal open={isModalOpen} onClose={handleCloseModal} player={editingPlayer} onSave={handleSavePlayer} />
 
       <div className="flex h-full flex-row gap-2">
-        {/* Coluna da Esquerda (Sidebar com TeamList) */}
         <aside className="basis-1/3 shrink-0">
           <TeamList
             teams={teams}
@@ -195,7 +193,6 @@ export function TeamManagementPage() {
           />
         </aside>
 
-        {/* Coluna da Direita (Editor de Time e Grid de Jogadores) */}
         <section className="basis-2/3 flex-grow">
           <div className="flex h-full flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
             {selectedTeam ? (

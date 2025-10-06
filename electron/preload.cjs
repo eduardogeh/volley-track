@@ -27,11 +27,12 @@ contextBridge.exposeInMainWorld('api', {
         update: (project) => ipcRenderer.invoke('projects:update', project),
         delete: (projectId) => ipcRenderer.invoke('projects:delete', projectId),
     },
+    playerAction: {
+        create: (action) => ipcRenderer.invoke('player-actions:create', action),
+        getByProjectId: (projectId) => ipcRenderer.invoke('player-actions:getByProjectId', projectId),
+    },
     dialog: {
         openFile: () => ipcRenderer.invoke('dialog:openFile'),
-    },
-    fileToUrl: {
-        convert: (filePath) => ipcRenderer.sendSync('file:toUrl', filePath),
     },
     getMediaServerUrl: () => ipcRenderer.invoke('get-media-server-url'),
 });

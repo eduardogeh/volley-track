@@ -1,4 +1,3 @@
-// src/components/analysis/InteractiveCategoryCard.tsx
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -24,16 +23,14 @@ export function InteractiveCategoryCard({ category, onScoutComplete }: Interacti
   const resultadoSubcategories = category.subcategories?.filter(sub => sub.type === 'resultado');
   const zonaSubcategories = category.subcategories?.filter(sub => sub.type === 'zona');
 
-  // Efeito que dispara o evento quando a combinação está completa
   useEffect(() => {
     if (selectedResultado && selectedZona) {
       onScoutComplete({ category, resultado: selectedResultado, zona: selectedZona });
 
-      // Reseta a seleção para a próxima ação
       const timer = setTimeout(() => {
         setSelectedResultado(null);
         setSelectedZona(null);
-      }, 150); // Um pequeno delay para o usuário ver a segunda seleção
+      }, 150);
 
       return () => clearTimeout(timer);
     }

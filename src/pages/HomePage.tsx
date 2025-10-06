@@ -17,7 +17,6 @@ export function HomePage() {
         <img src="/logo.png" alt="Logo do Projeto" style={{ maxHeight: '150px' }} />
       </div>
 
-      {/* Grid de botões */}
       <div className="grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
 
         <Button asChild size="lg">

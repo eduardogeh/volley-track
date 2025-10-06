@@ -2,7 +2,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Pencil, Trash2 } from "lucide-react";
 
-import type { Category } from '../../types/ScoutTypes.ts';
+import type { Category } from '@/types/ScoutTypes.ts';
 
 interface Props {
   category: Category;
@@ -42,7 +42,6 @@ export function CategoryCard({ category, onEdit, onDelete }: Props) {
           </div>
         </div>
 
-        {/* Corpo com as subcategorias */}
         <div className="flex h-[70%] flex-col">
           {resultadoSubcategories && resultadoSubcategories.length > 0 && (
             <div className="flex h-1/2 w-full border-t">

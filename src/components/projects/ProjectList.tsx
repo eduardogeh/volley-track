@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import {PlayCircle, PlusCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Project } from '../../types/ProjectTypes';
+import type { Project } from '@/types/ProjectTypes.ts';
 
 interface ProjectListProps {
   projects: Project[];
@@ -34,7 +34,6 @@ export function ProjectList({
 
   return (
     <div className="flex h-full flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
-      {/* ... (cabeçalho não muda) ... */}
       <div className="flex items-center justify-between border-b p-4">
         <h3 className="text-lg font-semibold">Projetos</h3>
         <Button variant="ghost" size="icon" onClick={onAddProject} title="Adicionar novo projeto">

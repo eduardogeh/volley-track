@@ -1,4 +1,3 @@
-// src/components/scouts/ScoutEditor.tsx
 import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
@@ -31,7 +30,6 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
     setModel(prev => ({ ...prev, [name]: numericValue }));
   };
 
-  // Função para atualizar o estado do modelo com as novas categorias
   const handleCategoriesChange = (updatedCategories: Category[]) => {
     setModel(prev => ({ ...prev, categories: updatedCategories }));
 
@@ -53,7 +51,6 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
     setModalOpen(true);
   };
 
-  // Ela atualiza o estado temporário da categoria que está sendo editada no modal.
   const handleCategoryEdit = (updatedCategory: Category) => {
     setEditingCategory(updatedCategory);
   };
@@ -75,7 +72,6 @@ export function ScoutEditor({ initialModel, onSave }: ScoutEditorProps) {
     closeModal();
   };
 
-  // Deleta a categoria a partir do card na grid principal
   const handleDeleteCategoryFromGrid = (index: number) => {
     const newCategories = model.categories.filter((_, i) => i !== index);
     handleCategoriesChange(newCategories);

@@ -1,5 +1,8 @@
 import type { PlayerProps, Team } from "./types/TeamPlayersTypes.ts";
-import type {Scout} from "./types/ScoutTypes.ts";
+import type { ScoutModel } from "./types/ScoutTypes.ts";
+import type { Project } from "./types/ProjectTypes.ts";
+import type { PlayerAction, ScoutedEvent } from "./types/PlayerActionTypes.ts";
+
 
 export {};
 
@@ -20,9 +23,9 @@ declare global {
         delete: (playerId: number) => void;
       };
       scout: {
-        getAll: () => Promise<Scout[]>;
-        getById: (scoutId: number) => Promise<Scout | null>;
-        save: (scout: Partial<Omit<Scout, 'id'>>) => Promise<number>;
+        getAll: () => Promise<ScoutModel[]>;
+        getById: (scoutId: number) => Promise<ScoutModel | null>;
+        save: (scout: Partial<Omit<ScoutModel, 'id'>>) => Promise<number>;
         delete: (scoutId: number) => Promise<void>;
       },
       project: {
@@ -35,10 +38,11 @@ declare global {
       dialog: {
         openFile: () => Promise<string | null>;
       };
-      fileToUrl: {
-        convert: (filePath: string) => string;
-      },
       getMediaServerUrl: () => Promise<string>;
+      playerAction: {
+        create: (action: PlayerAction) => Promise<number>;
+        getByProjectId: (projectId: number) => Promise<ScoutedEvent[]>;
+      };
     };
   }
 }

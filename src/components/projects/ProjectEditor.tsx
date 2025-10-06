@@ -1,4 +1,3 @@
-// src/components/projects/ProjectEditor.tsx
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -105,7 +104,6 @@ export function ProjectEditor({ project, onSave, onPlayProject }: ProjectEditorP
           </div>
           <div>
             <Label>Modelo de Scout</Label>
-            {/* Este é um exemplo, ajuste conforme sua necessidade */}
             <Select
               value={String(editedProject.id_scout_model)}
               onValueChange={(value) => handleChange('id_scout_model', Number(value))}

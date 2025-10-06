@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useRef, forwardRef, useImperativeHandle } from 'react';
 import {
   MediaController,
   MediaControlBar,
@@ -54,6 +54,10 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ src, 
       }}
     >
       <video
+        onTimeUpdate={(e) =>{
+          if(onTimeUpdate)
+            onTimeUpdate((e.target as HTMLVideoElement).currentTime);
+        }}
         ref={videoRef}
         slot="media"
         src={src}

@@ -10,7 +10,8 @@ import type {Category, ScoutModel, Subcategory} from '../types/ScoutTypes';
 import {VideoPlayer, type VideoPlayerRef} from "@/components/videoPlayer/VideoPlayer.tsx";
 import {InteractiveCategoryCard} from "@/components/analysis/InteractiveCategoryCard.tsx";
 import {PlayerSelectionModal} from "@/components/analysis/PlayerSelectionModal.tsx";
-import {type ScoutedEvent, ScoutedEventsSidebar} from "@/components/analysis/ScoutEventsSidebar.tsx";
+import {ScoutedEventsSidebar} from "@/components/analysis/ScoutEventsSidebar.tsx";
+import type {PlayerAction, ScoutedEvent} from "@/types/PlayerActionTypes.ts";
 
 interface CurrentScoutEvent {
   category: Category;
@@ -35,6 +36,7 @@ export function AnalysisPage() {
   const [scoutModel, setScoutModel] = useState<ScoutModel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const videoPlayerRef = useRef<VideoPlayerRef>(null);
+  const [clipEndTime, setClipEndTime] = useState<number | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentScoutEvent, setCurrentScoutEvent] = useState<CurrentScoutEvent | null>(null);
@@ -67,6 +69,9 @@ export function AnalysisPage() {
         setScoutModel(scoutData);
         setPlayers(playersData);
 
+        const existingActions = await window.api.playerAction.getByProjectId(Number(projectId));
+        setScoutedEvents(existingActions);
+
       } catch (error) {
         console.error("Erro ao carregar dados para análise:", error);
         toast.error("Não foi possível carregar os dados do projeto.");
@@ -94,36 +99,71 @@ export function AnalysisPage() {
     setIsModalOpen(false);
   }, []);
 
-  const handleConfirmPlayerSelection = useCallback((selectedPlayerId: number) => {
-    if (!currentScoutEvent) return;
+  const handleConfirmPlayerSelection = useCallback(async (selectedPlayerId: number) => {
+    if (!currentScoutEvent || !project) return;
     const player = players.find(p => p.id === selectedPlayerId);
     if(!player) return;
 
-    const newEvent: ScoutedEvent = {
-      id: Date.now(),
-      playerName: player.name,
-      playerNumber: player.number || 0,
-      playerPhoto: player.photo,
-      actionDescription: `${currentScoutEvent.category.name} - ${currentScoutEvent.resultado.name}`,
-      timestamp: currentScoutEvent.time
+
+    const { category, resultado, zona, time } = currentScoutEvent;
+
+    const clip_start = time - (category.time_to_clip_before_event || 5);
+    const clip_end = time + (category.time_to_clip_after_event || 5);
+
+    const actionToSave: PlayerAction = {
+      project_id: project.id,
+      player_id: selectedPlayerId,
+      resultado_id: resultado.id,
+      zona_id: zona.id,
+      clip_start: clip_start < 0 ? 0 : clip_start,
+      clip_end: clip_end,
     };
 
-    setScoutedEvents(prevEvents => [...prevEvents, newEvent].sort((a,b) => a.timestamp - b.timestamp));
+    try {
+      const newActionId = await window.api.playerAction.create(actionToSave);
 
-    toast.success(`Registrado: ${newEvent.actionDescription}`);
+      const newEvent: ScoutedEvent = {
+        id: newActionId,
+        playerName: player.name,
+        playerNumber: player.number || 0,
+        playerPhoto: player.photo,
+        actionDescription: `${category.name}  ${resultado.name}`,
+        categoryName: category.name,
+        categoryColor: category.color || '#000000',
+        clipStart: actionToSave.clip_start || time,
+        clipEnd: actionToSave.clip_end,
+      };
+      setScoutedEvents(prevEvents => [...prevEvents, newEvent].sort((a,b) => a.clipStart - b.clipStart));
+
+      toast.success(`Registrado: ${newEvent.actionDescription}`);
+    } catch (error) {
+      console.error("Erro ao salvar a ação:", error);
+      toast.error("Falha ao registrar a ação no banco de dados.");
+    }
 
     setCurrentScoutEvent(null);
     handleCloseModal();
-  }, [currentScoutEvent, players, handleCloseModal]);
+  }, [currentScoutEvent, players, project, handleCloseModal]);
 
   const scoutActionDescription = useMemo(() => {
     if (!currentScoutEvent) return '';
     return `${currentScoutEvent.category.name}: ${currentScoutEvent.resultado.name} na ${currentScoutEvent.zona.name}`;
   }, [currentScoutEvent]);
 
-  // <<< NOVA FUNÇÃO PARA O CLIQUE NA SIDEBAR >>>
-  const handleEventClick = (timestamp: number) => {
-    videoPlayerRef.current?.seekTo(timestamp);
+  const handleEventClick = (event: ScoutedEvent) => {
+    videoPlayerRef.current?.seekTo(event.clipStart);
+    videoPlayerRef.current?.play();
+    console.log("Seeking to:", event.clipStart, "Setting clip end to:", event.clipEnd);
+    setClipEndTime(event.clipEnd || null);
+  };
+
+
+  const handleVideoProgress = (currentTime: number) => {
+    console.log("Current Time:", currentTime, "Clip End Time:", clipEndTime);
+    if (clipEndTime !== null && currentTime >= clipEndTime) {
+      videoPlayerRef.current?.pause();
+      setClipEndTime(null);
+    }
   };
 
   if (isLoading) {
@@ -136,11 +176,6 @@ export function AnalysisPage() {
 
   return (
     <main className="h-screen w-screen p-4 flex flex-row gap-4">
-      {/* O layout principal agora é uma linha horizontal (flex-row) */}
-
-      {/* ###################################################### */}
-      {/* <<< COLUNA DA ESQUERDA: SIDEBAR COMPLETA >>> */}
-      {/* ###################################################### */}
       <aside className="w-[350px] h-full shrink-0 flex flex-col gap-4">
 
         {/* Cabeçalho da Sidebar */}
@@ -154,24 +189,21 @@ export function AnalysisPage() {
           <h1 className="text-2xl font-bold">{project.tournament} - {project.season}</h1>
         </div>
 
-        {/* Lista de Ações (ocupa o espaço restante da sidebar) */}
+        {/* Lista de Ações */}
         <div className="flex-grow overflow-hidden">
           <ScoutedEventsSidebar events={scoutedEvents} onEventClick={handleEventClick} />
         </div>
       </aside>
 
-      {/* ###################################################### */}
-      {/* <<< COLUNA DA DIREITA: VÍDEO E FERRAMENTAS >>> */}
-      {/* ###################################################### */}
       <section className="flex-grow h-full flex flex-col gap-4 overflow-hidden">
 
         {/* ÁREA DO VÍDEO */}
-        {/* 'flex-grow' faz o vídeo ocupar o espaço vertical, respeitando a altura fixa das ferramentas abaixo */}
         <div className="w-full bg-card rounded-lg p-4 flex-grow overflow-hidden">
           {videoUrl ? (
             <VideoPlayer
               ref={videoPlayerRef}
               src={videoUrl}
+              onTimeUpdate={handleVideoProgress}
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full bg-muted rounded-md">
@@ -180,7 +212,7 @@ export function AnalysisPage() {
           )}
         </div>
 
-        {/* --- ÁREA DAS FERRAMENTAS DE SCOUT --- */}
+        {/* ÁREA DAS FERRAMENTAS DE SCOUT */}
         <div className="h-[280px] shrink-0 rounded-lg border bg-card text-card-foreground shadow-sm p-4 flex flex-col overflow-hidden">
           <div className="overflow-y-auto pb-4">
             {scoutModel && (

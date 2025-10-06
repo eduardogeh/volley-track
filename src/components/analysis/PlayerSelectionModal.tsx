@@ -1,4 +1,3 @@
-// src/components/analysis/PlayerSelectionModal.tsx
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -19,7 +18,6 @@ export function PlayerSelectionModal({ isOpen, onClose, players, onConfirm, scou
   const handleConfirm = () => {
     if (selectedPlayerId) {
       onConfirm(selectedPlayerId);
-      // O onClose será chamado pelo onOpenChange
     }
   };
 
@@ -45,7 +43,7 @@ export function PlayerSelectionModal({ isOpen, onClose, players, onConfirm, scou
             <Button
               key={player.id}
               variant="outline"
-              onClick={() => setSelectedPlayerId(player.id)}
+              onClick={() => setSelectedPlayerId(player.id || null)}
               className={cn("h-16 flex flex-col", selectedPlayerId === player.id && "ring-2 ring-primary")}
             >
               <span className="text-2xl font-bold">{player.number}</span>
