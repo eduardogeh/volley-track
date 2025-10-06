@@ -157,6 +157,24 @@ export function AnalysisPage() {
     setClipEndTime(event.clipEnd || null);
   };
 
+  const handleDeleteEvent = useCallback(async (eventId: number) => {
+    const eventToDelete = scoutedEvents.find(e => e.id === eventId);
+    if (!eventToDelete) return;
+
+    const confirmed = window.confirm(`Tem certeza que deseja excluir a ação "${eventToDelete.actionDescription}"?`);
+    if (confirmed) {
+      try {
+        await window.api.playerAction.delete(eventId);
+
+        setScoutedEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+
+        toast.success("Ação removida com sucesso!");
+      } catch (error) {
+        console.error("Erro ao remover a ação:", error);
+        toast.error("Não foi possível remover a ação.");
+      }
+    }
+  }, [scoutedEvents]);
 
   const handleVideoProgress = (currentTime: number) => {
     console.log("Current Time:", currentTime, "Clip End Time:", clipEndTime);
@@ -186,12 +204,12 @@ export function AnalysisPage() {
               Voltar para Projetos
             </RouterLink>
           </Button>
-          <h1 className="text-2xl font-bold">{project.tournament} - {project.season}</h1>
+          <h1 className="text-2xl font-bold">{project.description}</h1>
         </div>
 
         {/* Lista de Ações */}
         <div className="flex-grow overflow-hidden">
-          <ScoutedEventsSidebar events={scoutedEvents} onEventClick={handleEventClick} />
+          <ScoutedEventsSidebar events={scoutedEvents} onDeleteEvent={handleDeleteEvent} onEventClick={handleEventClick} />
         </div>
       </aside>
 

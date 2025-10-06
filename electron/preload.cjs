@@ -30,6 +30,7 @@ contextBridge.exposeInMainWorld('api', {
     playerAction: {
         create: (action) => ipcRenderer.invoke('player-actions:create', action),
         getByProjectId: (projectId) => ipcRenderer.invoke('player-actions:getByProjectId', projectId),
+        delete: (actionId) => ipcRenderer.invoke('player-actions:delete', actionId),
     },
     dialog: {
         openFile: () => ipcRenderer.invoke('dialog:openFile'),

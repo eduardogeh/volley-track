@@ -56,4 +56,14 @@ function getByProjectId(projectId) {
     }));
 }
 
-module.exports = { create, getByProjectId };
+/**
+ * Deleta uma ação de jogador pelo seu ID.
+ */
+function deleteAction(actionId) {
+    const db = getDb();
+    const stmt = db.prepare('DELETE FROM player_actions WHERE id = ?');
+    const info = stmt.run(actionId);
+    return info.changes > 0;
+}
+
+module.exports = { create, getByProjectId, delete: deleteAction };

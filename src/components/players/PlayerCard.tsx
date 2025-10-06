@@ -7,13 +7,24 @@ import type { PlayerProps } from "../../types/TeamPlayersTypes.ts";
 export type PlayerCardProps = {
   player?: PlayerProps;
   onCardClick: (player: PlayerProps) => void;
-  onEditClick: (player: PlayerProps | null) => void;
+  onEditClick?: (player: PlayerProps | null) => void;
   isSelected?: boolean;
   colorOfCard?: string;
-  onDeletePlayer: (player: PlayerProps) => void;
+  onDeletePlayer?: (player: PlayerProps) => void;
+  showEditButton?: boolean;
+  showDeleteButton?: boolean;
 }
 
-export function PlayerCard({ player, onCardClick, onEditClick, isSelected, colorOfCard, onDeletePlayer }: PlayerCardProps) {
+export function PlayerCard({
+  player,
+  onCardClick,
+  onEditClick,
+  isSelected,
+  colorOfCard,
+  onDeletePlayer,
+  showEditButton = true,
+  showDeleteButton = true
+}: PlayerCardProps) {
 
   if (!player) return null;
 
@@ -51,24 +62,28 @@ export function PlayerCard({ player, onCardClick, onEditClick, isSelected, color
         </div>
 
         {/* Botão de Editar */}
-        <Button
-          size="icon"
-          variant="ghost"
-          className="absolute right-1 top-1 h-7 w-7 bg-black/50 text-white hover:bg-black/80 hover:text-white"
-          onClick={(e) => handleActionClick(e, () => onEditClick(player))}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
+        {showEditButton && onEditClick && (
+          <Button
+            size="icon"
+            variant="ghost"
+            className="absolute right-1 top-1 h-7 w-7 bg-black/50 text-white hover:bg-black/80 hover:text-white"
+            onClick={(e) => handleActionClick(e, () => onEditClick(player!))}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        )}
 
         {/* Botão de Excluir */}
-        <Button
-          size="icon"
-          variant="ghost"
-          className="absolute bottom-1 right-1 h-7 w-7 bg-black/50 text-white hover:bg-destructive/80 hover:text-white"
-          onClick={(e) => handleActionClick(e, () => onDeletePlayer(player))}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        {showDeleteButton && onDeletePlayer && (
+          <Button
+            size="icon"
+            variant="ghost"
+            className="absolute bottom-1 right-1 h-7 w-7 bg-black/50 text-white hover:bg-destructive/80 hover:text-white"
+            onClick={(e) => handleActionClick(e, () => onDeletePlayer(player!))}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );

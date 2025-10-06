@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { PlayerCard } from '../players/PlayerCard';
 import type { PlayerProps } from '@/types/TeamPlayersTypes';
 
 interface PlayerSelectionModalProps {
@@ -15,6 +17,13 @@ interface PlayerSelectionModalProps {
 export function PlayerSelectionModal({ isOpen, onClose, players, onConfirm, scoutActionDescription }: PlayerSelectionModalProps) {
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
 
+  const { titulares, reservas } = useMemo(() => {
+    return {
+      titulares: players.slice(0, 6),
+      reservas: players.slice(6),
+    };
+  }, [players]);
+
   const handleConfirm = () => {
     if (selectedPlayerId) {
       onConfirm(selectedPlayerId);
@@ -27,30 +36,61 @@ export function PlayerSelectionModal({ isOpen, onClose, players, onConfirm, scou
     }
   };
 
+  const renderDividerWithLabel = (label: string) => (
+    <div className="relative my-4">
+      <div className="absolute inset-0 flex items-center">
+        <Separator />
+      </div>
+      <div className="relative flex justify-center">
+        <Badge variant="secondary">{label}</Badge>
+      </div>
+    </div>
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      {/* <<< ADICIONE A CLASSE DE LARGURA AQUI >>> */}
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>Selecionar Jogador</DialogTitle>
           <DialogDescription>
             Ação: <span className="font-semibold">{scoutActionDescription}</span>
           </DialogDescription>
         </DialogHeader>
-        {/* Aumentei o grid para 4 colunas para preencher melhor o espaço */}
-        <div className="max-h-[60vh] overflow-y-auto p-4 grid grid-cols-4 gap-2">
-          {players.map((player) => (
-            <Button
-              key={player.id}
-              variant="outline"
-              onClick={() => setSelectedPlayerId(player.id || null)}
-              className={cn("h-16 flex flex-col", selectedPlayerId === player.id && "ring-2 ring-primary")}
-            >
-              <span className="text-2xl font-bold">{player.number}</span>
-              <span className="text-xs truncate">{player.name}</span>
-            </Button>
-          ))}
+
+        <div className="max-h-[70vh] overflow-y-auto p-4">
+          {renderDividerWithLabel("Titulares")}
+          <div className="flex flex-wrap justify-center gap-4">
+            {titulares.map((player) => (
+              <PlayerCard
+                key={player.id}
+                player={player}
+                onCardClick={() => setSelectedPlayerId(player.id!)}
+                isSelected={selectedPlayerId === player.id}
+                showEditButton={false}
+                showDeleteButton={false}
+              />
+            ))}
+          </div>
+
+          {reservas.length > 0 && (
+            <>
+              {renderDividerWithLabel("Reservas")}
+              <div className="flex flex-wrap justify-center gap-4">
+                {reservas.map((player) => (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    onCardClick={() => setSelectedPlayerId(player.id!)}
+                    isSelected={selectedPlayerId === player.id}
+                    showEditButton={false}
+                    showDeleteButton={false}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
           <Button onClick={handleConfirm} disabled={!selectedPlayerId}>Confirmar</Button>

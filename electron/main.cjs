@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, protocol } = require('electron'); // <<< A MUDANÇA ESTÁ AQUI
+const { app, BrowserWindow, ipcMain, dialog, protocol } = require('electron');
 const path = require('path');
 const express = require('express');
 const getPort = require('get-port');
@@ -18,7 +18,6 @@ async function startMediaServer() {
 
     server.get(/\/media\/(.+)/, (req, res) => {
         try {
-            // O caminho capturado estará em req.params[0]
             const filePath = decodeURIComponent(req.params[0]);
             console.log(`[MediaServer] Servindo arquivo: ${filePath}`);
             res.sendFile(filePath);
@@ -35,7 +34,6 @@ async function startMediaServer() {
     });
 }
 
-// IPC para o frontend descobrir a URL do servidor
 ipcMain.handle('get-media-server-url', () => {
     return mediaServerUrl;
 });
@@ -84,6 +82,7 @@ ipcMain.handle('projects:delete', (event, projectId) => projectRepository.delete
 
 ipcMain.handle('player-actions:create', (event, action) => playerActionRepository.create(action));
 ipcMain.handle('player-actions:getByProjectId', (event, projectId) => playerActionRepository.getByProjectId(projectId));
+ipcMain.handle('player-actions:delete', (event, actionId) => playerActionRepository.delete(actionId));
 
 // ------------------ Inicialização ------------------
 app.whenReady().then(async () => {

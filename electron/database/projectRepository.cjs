@@ -19,7 +19,6 @@ const projectRepository = {
 
     create(project) {
         const db = getDb();
-        // <<< ATUALIZADO para incluir video_path >>>
         const { season, tournament, description, id_team, id_scout_model, video_path } = project;
         const stmt = db.prepare(
             'INSERT INTO projects (season, tournament, description, id_team, id_scout_model, video_path) VALUES (?, ?, ?, ?, ?, ?)'
@@ -30,7 +29,6 @@ const projectRepository = {
 
     update(project) {
         const db = getDb();
-        // <<< ATUALIZADO para incluir video_path >>>
         const { id, season, tournament, description, id_team, id_scout_model, video_path } = project;
         const stmt = db.prepare(
             'UPDATE projects SET season = ?, tournament = ?, description = ?, id_team = ?, id_scout_model = ?, video_path = ? WHERE id = ?'

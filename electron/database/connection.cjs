@@ -10,7 +10,7 @@ function initDatabase(dbPath) {
     if (!db) {
         try {
             db = new Database(dbPath, { verbose: console.log });
-            setupSchema(); // Roda a configuração do schema depois de conectar
+            setupSchema();
             console.log('Conexão com o banco de dados estabelecida com sucesso.');
         } catch (error) {
             console.error('Falha ao conectar ao banco de dados:', error);

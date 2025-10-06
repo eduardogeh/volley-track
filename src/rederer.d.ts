@@ -42,6 +42,7 @@ declare global {
       playerAction: {
         create: (action: PlayerAction) => Promise<number>;
         getByProjectId: (projectId: number) => Promise<ScoutedEvent[]>;
+        delete: (actionId: number) => Promise<boolean>;
       };
     };
   }

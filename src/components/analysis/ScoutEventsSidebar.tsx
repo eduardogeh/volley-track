@@ -4,14 +4,17 @@ import { cn } from "@/lib/utils";
 import type {ScoutedEvent} from "@/types/PlayerActionTypes.ts";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "../ui/accordion";
 import {useEffect, useMemo, useState} from "react";
+import { Button } from "../ui/button";
+import {Trash2} from "lucide-react";
 
 interface ScoutedEventsSidebarProps {
   events: ScoutedEvent[];
   onEventClick: (event: ScoutedEvent) => void;
+  onDeleteEvent: (eventId: number) => void;
   activeEventId?: number | null;
 }
 
-export function ScoutedEventsSidebar({ events, onEventClick, activeEventId }: ScoutedEventsSidebarProps) {
+export function ScoutedEventsSidebar({ events, onEventClick, onDeleteEvent, activeEventId }: ScoutedEventsSidebarProps) {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -61,26 +64,41 @@ export function ScoutedEventsSidebar({ events, onEventClick, activeEventId }: Sc
                 <AccordionContent className="pt-1 pb-0">
                   <div className="space-y-1 pl-4 border-l-2" style={{borderColor: data.color}}>
                     {data.events.map((event) => (
-                      <button
-                        key={event.id}
-                        onClick={() => onEventClick(event)}
-                        className={cn(
-                          "w-full text-left p-2 rounded-md flex items-center gap-3 transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring",
-                          activeEventId === event.id && "bg-accent"
-                        )}
-                      >
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={event.playerPhoto} />
-                          <AvatarFallback>{event.playerNumber}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-grow text-sm">
-                          <p className="font-semibold">{event.actionDescription}</p>
-                          <p className="text-xs text-muted-foreground">{event.playerName}</p>
-                        </div>
-                        <div className="text-sm font-mono text-muted-foreground">
-                          {formatTime(event.clipStart)}
-                        </div>
-                      </button>
+                      <div key={event.id} className="group flex items-center rounded-md pr-1 transition-colors hover:bg-accent">
+                        <button
+                          onClick={() => onEventClick(event)}
+                          className={cn(
+                            "flex-grow text-left p-2 flex items-center gap-3 transition-colors focus:outline-none",
+                            activeEventId === event.id && "bg-accent"
+                          )}
+                        >
+                          <Avatar className="h-9 w-9">
+                            <AvatarImage src={event.playerPhoto} />
+                            <AvatarFallback>{event.playerNumber}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-grow text-sm">
+                            <p className="font-semibold">{event.actionDescription}</p>
+                            <p className="text-xs text-muted-foreground">{event.playerName}</p>
+                          </div>
+                          <div className="text-sm font-mono text-muted-foreground">
+                            {formatTime(event.clipStart)}
+                          </div>
+                        </button>
+
+                        {/* Botão de Deletar que aparece no hover */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteEvent(event.id);
+                          }}
+                          title="Excluir ação"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     ))}
                   </div>
                 </AccordionContent>
