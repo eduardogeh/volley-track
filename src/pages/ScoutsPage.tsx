@@ -56,7 +56,6 @@ export function ScoutsPage() {
 
   const handleUpdateScout = async (scoutToSave: ScoutModel) => {
     try {
-      console.log("Creating new scout:", scoutToSave);
       await window.api.scout.save(scoutToSave);
       await refetchAndSelectScout(scoutToSave.id);
       toast.success(`Scout "${scoutToSave.name}" salvo com sucesso!`);

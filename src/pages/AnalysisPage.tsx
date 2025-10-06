@@ -153,7 +153,6 @@ export function AnalysisPage() {
   const handleEventClick = (event: ScoutedEvent) => {
     videoPlayerRef.current?.seekTo(event.clipStart);
     videoPlayerRef.current?.play();
-    console.log("Seeking to:", event.clipStart, "Setting clip end to:", event.clipEnd);
     setClipEndTime(event.clipEnd || null);
   };
 
@@ -177,7 +176,6 @@ export function AnalysisPage() {
   }, [scoutedEvents]);
 
   const handleVideoProgress = (currentTime: number) => {
-    console.log("Current Time:", currentTime, "Clip End Time:", clipEndTime);
     if (clipEndTime !== null && currentTime >= clipEndTime) {
       videoPlayerRef.current?.pause();
       setClipEndTime(null);
