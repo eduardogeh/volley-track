@@ -17,7 +17,7 @@ export function HomePage() {
         <img src="/logo.png" alt="Logo do Projeto" style={{ maxHeight: '150px' }} />
       </div>
 
-      <div className="grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 
         <Button asChild size="lg">
           <RouterLink to='/projects' >
@@ -40,9 +40,11 @@ export function HomePage() {
           </RouterLink>
         </Button>
 
-        <Button size="lg" disabled>
-          <BarChart3 className="mr-2 h-5 w-5" />
-          Dashboards
+        <Button asChild size="lg">
+          <RouterLink to="/dashboards">
+            <BarChart3 className="mr-2 h-5 w-5" />
+            Dashboards
+          </RouterLink>
         </Button>
       </div>
     </main>

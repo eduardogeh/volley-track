@@ -32,6 +32,9 @@ contextBridge.exposeInMainWorld('api', {
         getByProjectId: (projectId) => ipcRenderer.invoke('player-actions:getByProjectId', projectId),
         delete: (actionId) => ipcRenderer.invoke('player-actions:delete', actionId),
     },
+    reports: {
+        exportMatchReportExcel: (projectId) => ipcRenderer.invoke('reports:exportMatchReportExcel', projectId),
+    },
     dialog: {
         openFile: () => ipcRenderer.invoke('dialog:openFile'),
     },

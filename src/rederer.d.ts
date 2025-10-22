@@ -38,6 +38,9 @@ declare global {
       dialog: {
         openFile: () => Promise<string | null>;
       };
+      reports: {
+        exportMatchReportExcel: (projectId: number) => Promise<{success: boolean, message?: string, path?: string}>;
+      };
       getMediaServerUrl: () => Promise<string>;
       playerAction: {
         create: (action: PlayerAction) => Promise<number>;

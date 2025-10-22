@@ -11,6 +11,9 @@ const playerRepository = require('./database/playerRepository.cjs');
 const scoutRepository = require('./database/scoutRepository.cjs');
 const projectRepository = require('./database/projectRepository.cjs');
 const playerActionRepository = require('./database/playerActionRepository.cjs');
+const reportsRepository = require('./database/reportsRepository.cjs');
+const fs = require('fs');
+const excelService = require('./excelService.cjs'); // <<< IMPORTE O NOVO SERVIÇO
 
 
 async function startMediaServer() {
@@ -83,6 +86,35 @@ ipcMain.handle('projects:delete', (event, projectId) => projectRepository.delete
 ipcMain.handle('player-actions:create', (event, action) => playerActionRepository.create(action));
 ipcMain.handle('player-actions:getByProjectId', (event, projectId) => playerActionRepository.getByProjectId(projectId));
 ipcMain.handle('player-actions:delete', (event, actionId) => playerActionRepository.delete(actionId));
+
+
+ipcMain.handle('reports:exportMatchReportExcel', async (event, projectId) => {
+    try {
+        const reportData = await reportsRepository.getDynamicMatchReport(projectId);
+        if (!reportData || reportData.data.length === 0) {
+            return { success: false, message: 'Não há dados para exportar.' };
+        }
+        const excelBuffer = await excelService.generateMatchReportExcel(reportData);
+
+        const { filePath } = await dialog.showSaveDialog({
+            title: 'Salvar Relatório do Jogo',
+            defaultPath: `match-report-${Date.now()}.xlsx`,
+            filters: [{ name: 'Excel Files', extensions: ['xlsx'] }]
+        });
+
+        if (filePath) {
+            fs.writeFileSync(filePath, excelBuffer);
+            return { success: true, path: filePath };
+        }
+
+        return { success: false, message: 'Exportação cancelada.' };
+
+    } catch (error) {
+        console.error('Erro ao exportar para Excel:', error);
+        return { success: false, message: `Erro: ${error.message}` };
+    }
+});
+
 
 // ------------------ Inicialização ------------------
 app.whenReady().then(async () => {

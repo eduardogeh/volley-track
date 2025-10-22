@@ -7,6 +7,7 @@ import { TeamManagementPage } from './pages/TeamManagementPage';
 import { ScoutsPage } from "./pages/ScoutsPage.tsx";
 import {ProjectManagementPage} from "@/pages/ProjectManagementPage.tsx";
 import {AnalysisPage} from "@/pages/AnalysisPage.tsx";
+import {ReportsPage} from "@/pages/ReportsPage.tsx";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/scouts" element={<ScoutsPage />} />
           <Route path="/projects" element={<ProjectManagementPage />} />
           <Route path="/analysis/:projectId" element={<AnalysisPage />} />
+          <Route path="dashboards" element={<ReportsPage />} />
         </Routes>
       </Router>
       <Toaster richColors position="bottom-right" />
