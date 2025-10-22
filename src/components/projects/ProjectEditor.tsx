@@ -96,7 +96,7 @@ export function ProjectEditor({ project, onSave, onPlayProject }: ProjectEditorP
               value={String(editedProject.id_team)}
               onValueChange={(value) => handleChange('id_team', Number(value))}
             >
-              <SelectTrigger><SelectValue placeholder="Selecione um time..." /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Selecione um time..." /></SelectTrigger>
               <SelectContent>
                 {teams.map(team => <SelectItem key={team.id} value={String(team.id)}>{team.name}</SelectItem>)}
               </SelectContent>
@@ -108,7 +108,7 @@ export function ProjectEditor({ project, onSave, onPlayProject }: ProjectEditorP
               value={String(editedProject.id_scout_model)}
               onValueChange={(value) => handleChange('id_scout_model', Number(value))}
             >
-              <SelectTrigger><SelectValue placeholder="Selecione um modelo..." /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Selecione um modelo..." /></SelectTrigger>
               <SelectContent>
                 {scoutModels.map(model => <SelectItem key={model.id} value={String(model.id)}>{model.name}</SelectItem>)}
               </SelectContent>

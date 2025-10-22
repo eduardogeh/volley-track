@@ -63,54 +63,64 @@ export function ReportsPage() {
   };
 
   return (
-    <main className="h-screen w-screen p-4 flex flex-col items-center">
-      <div className="absolute left-4 top-4">
-        <Button asChild variant="outline">
-          <RouterLink to="/">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar
-          </RouterLink>
-        </Button>
-      </div>
+    // Container principal que centraliza tudo na tela
+    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-background p-4">
 
-      <header className="text-center mt-16 mb-8">
-        <h1 className="text-3xl font-bold">Relatórios de Partida</h1>
-        <p className="text-muted-foreground mt-2">
-          Selecione uma partida e clique em "Gerar" para exportar as estatísticas para um arquivo Excel.
-        </p>
-      </header>
+      {/* Bloco de conteúdo com largura máxima definida */}
+      <div className="w-full max-w-md space-y-8">
 
-      <div className="flex flex-col items-center gap-4 p-6 rounded-lg border bg-card shadow-sm w-full max-w-md">
-        <div className="w-full">
-          <label htmlFor="project-select" className="text-sm font-medium mb-2 block">
-            Partida
-          </label>
-          <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
-            <SelectTrigger id="project-select">
-              <SelectValue placeholder="Selecione uma partida..." />
-            </SelectTrigger>
-            <SelectContent>
-              {projects.map((p) => (
-                <SelectItem key={p.id} value={String(p.id)}>
-                  {p.tournament} - {p.season}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Cabeçalho */}
+        <header className="text-center">
+          <h1 className="text-3xl font-bold tracking-tight">Relatórios de Partida</h1>
+          <p className="text-muted-foreground mt-2">
+            Selecione uma partida para exportar as estatísticas.
+          </p>
+        </header>
+
+        {/* Card com as ações principais */}
+        <div className="flex flex-col gap-4 rounded-lg border bg-card p-6 shadow-sm">
+          <div className="w-full">
+            <label htmlFor="project-select" className="mb-2 block text-sm font-medium text-card-foreground">
+              Partida
+            </label>
+            <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+              <SelectTrigger id="project-select" className="w-full">
+                <SelectValue placeholder="Selecione uma partida..." />
+              </SelectTrigger>
+              <SelectContent>
+                {projects.map((p) => (
+                  <SelectItem key={p.id} value={String(p.id)}>
+                    {p.tournament} - {p.season}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button
+            onClick={handleExportExcel}
+            disabled={!selectedProjectId || isExporting}
+            className="w-full"
+          >
+            {isExporting ? "Gerando..." : (
+              <>
+                <FileDown className="mr-2 h-4 w-4" />
+                Gerar Relatório
+              </>
+            )}
+          </Button>
         </div>
 
-        <Button
-          onClick={handleExportExcel}
-          disabled={!selectedProjectId || isExporting}
-          className="w-full"
-        >
-          {isExporting ? "Gerando..." : (
-            <>
-              <FileDown className="mr-2 h-4 w-4" />
-              Gerar Relatório Excel
-            </>
-          )}
-        </Button>
+        {/* Botão de navegação para voltar */}
+        <div className="text-center">
+          <Button asChild variant="outline" className="w-full sm:w-auto">
+            <RouterLink to="/">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar ao Início
+            </RouterLink>
+          </Button>
+        </div>
+
       </div>
     </main>
   );
