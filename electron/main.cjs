@@ -87,6 +87,18 @@ ipcMain.handle('player-actions:create', (event, action) => playerActionRepositor
 ipcMain.handle('player-actions:getByProjectId', (event, projectId) => playerActionRepository.getByProjectId(projectId));
 ipcMain.handle('player-actions:delete', (event, actionId) => playerActionRepository.delete(actionId));
 
+ipcMain.handle('dialog:openFile', async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [
+      { name: 'Videos', extensions: ['mp4', 'mov', 'avi', 'mkv'] }
+    ]
+  });
+  if (!canceled) {
+    return filePaths[0];
+  }
+  return null;
+});
 
 ipcMain.handle('reports:exportMatchReportExcel', async (event, projectId) => {
     try {

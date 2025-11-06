@@ -61,12 +61,16 @@ async function generateMatchReportExcel(report) {
                 const colLetter = worksheet.getColumn(startColNum + 1 + i).letter;
                 formulaParts.push(`${colLetter}${row.number}*${weights[i]}`);
             }
-            const efFormula = `IF(${totalCell.address}>0, (${formulaParts.join(' + ')}) / (${totalCell.address}*10), 0)`;
-            row.getCell(startColNum + headers[catName].length + 1).value = { formula: efFormula };
 
             const mostPositiveSubCat = modelStructure
                 .filter(s => s.categoryName === catName)
                 .reduce((max, sub) => (sub.subCategoryWeight > max.subCategoryWeight ? sub : max));
+
+            const maiorPeso = mostPositiveSubCat ? mostPositiveSubCat.subCategoryWeight : 0;
+
+            const denominator = `(${totalCell.address}*${maiorPeso})`;
+            const efFormula = `IF(${denominator}>0, (${formulaParts.join(' + ')}) / ${denominator}, 0)`;
+            row.getCell(startColNum + headers[catName].length + 1).value = { formula: efFormula };
 
             const subCatIndex = headers[catName].indexOf(mostPositiveSubCat.subCategoryName);
 
@@ -107,12 +111,19 @@ async function generateMatchReportExcel(report) {
                 const colLetter = worksheet.getColumn(startColNum + 1 + i).letter;
                 formulaParts.push(`${colLetter}${absTotalRow.number}*${weights[i]}`);
             }
-            const efFormula = `IF(${totalCellAddress}>0, (${formulaParts.join(' + ')}) / (${totalCellAddress}*10), 0)`;
-            absTotalRow.getCell(startColNum + subCats.length + 1).value = { formula: efFormula };
+
             const mostPositiveSubCat = modelStructure
                 .filter(s => s.categoryName === catName)
                 .reduce((max, sub) => (sub.subCategoryWeight > max.subCategoryWeight ? sub : max));
+
+            const maiorPeso = mostPositiveSubCat ? mostPositiveSubCat.subCategoryWeight : 0;
+
+            const denominator = `(${totalCellAddress}*${maiorPeso})`;
+            const efFormula = `IF(${denominator}>0, (${formulaParts.join(' + ')}) / ${denominator}, 0)`;
+            absTotalRow.getCell(startColNum + subCats.length + 1).value = { formula: efFormula };
+
             const subCatIndex = subCats.indexOf(mostPositiveSubCat.subCategoryName);
+
             const positiveActionColLetter = worksheet.getColumn(startColNum + 1 + subCatIndex).letter;
             const positiveActionCellAddress = `${positiveActionColLetter}${absTotalRow.number}`;
             const coefFormula = `IFERROR(${totalCellAddress}/${positiveActionCellAddress}, 0)`;
