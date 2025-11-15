@@ -80,6 +80,11 @@
       {
         "from": "electron/database/volei_manager.sqlite",
         "to": "volei_manager.sqlite"
+      },
+      {
+        "from": "public/",
+        "to": "public/",
+        "filter": ["**/*"]
       }
     ],
     "win": {

@@ -48,7 +48,7 @@ export function PlayerCard({
         )}
       >
         <img
-          src={player.photo || '/no-image.png'}
+          src={player.photo || 'no-image.png'}
           alt={player.name}
           className="aspect-[1/1.2] w-full object-cover"
         />
