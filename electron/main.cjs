@@ -13,7 +13,7 @@ const projectRepository = require('./database/projectRepository.cjs');
 const playerActionRepository = require('./database/playerActionRepository.cjs');
 const reportsRepository = require('./database/reportsRepository.cjs');
 const fs = require('fs');
-const excelService = require('./excelService.cjs'); // <<< IMPORTE O NOVO SERVIÇO
+const excelService = require('./excelService.cjs');
 
 
 async function startMediaServer() {
@@ -56,7 +56,7 @@ function createWindow() {
         mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
         mainWindow.webContents.openDevTools();
     } else {
-        mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+        mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
     }
 }
 
