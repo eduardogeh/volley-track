@@ -74,7 +74,7 @@ export function ProjectEditor({ project, onSave, onPlayProject }: ProjectEditorP
         </div>
 
         <div>
-          <Label htmlFor="video-path">Caminho do Vídeo</Label>
+          <Label htmlFor="video-path">Vídeo da Partida</Label>
           <div className="flex items-center gap-2">
             <Input
               id="video-path"

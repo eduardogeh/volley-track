@@ -36,14 +36,14 @@ export function HomePage() {
         <Button asChild size="lg">
           <RouterLink to="/scouts">
             <LineChart className="mr-2 h-5 w-5" />
-            Scouts
+            Scouts/Dashboards
           </RouterLink>
         </Button>
 
         <Button asChild size="lg">
           <RouterLink to="/dashboards">
             <BarChart3 className="mr-2 h-5 w-5" />
-            Dashboards
+            Match Report
           </RouterLink>
         </Button>
       </div>
