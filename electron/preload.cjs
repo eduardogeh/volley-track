@@ -38,5 +38,11 @@ contextBridge.exposeInMainWorld('api', {
     dialog: {
         openFile: () => ipcRenderer.invoke('dialog:openFile'),
     },
+    video: {
+        exportPlaylist: (payload) => ipcRenderer.invoke("video:exportPlaylist", payload),
+    },
+    shell: {
+        openPath: (filePath) => ipcRenderer.invoke('shell:openPath', filePath),
+    },
     getMediaServerUrl: () => ipcRenderer.invoke('get-media-server-url'),
 });

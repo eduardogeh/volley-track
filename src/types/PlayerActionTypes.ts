@@ -15,6 +15,8 @@ export type ScoutedEvent = {
   playerPhoto?: string;
   actionDescription?: string;
   categoryName: string;
+  resultadoName: string;
+  zonaName: string;
   categoryColor: string;
   clipStart: number;
   clipEnd?: number;
