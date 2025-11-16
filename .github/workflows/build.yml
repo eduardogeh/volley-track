@@ -6,7 +6,11 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
@@ -28,5 +32,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: volley-track-installer
-          path: dist/*.exe
+          name: volley-track-installer-${{ matrix.os }}
+          
+          path: dist/*
