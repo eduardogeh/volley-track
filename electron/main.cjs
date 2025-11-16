@@ -14,6 +14,7 @@ const playerActionRepository = require('./database/playerActionRepository.cjs');
 const reportsRepository = require('./database/reportsRepository.cjs');
 const fs = require('fs');
 const excelService = require('./excelService.cjs');
+const { exportPlaylist } = require('./videoExport.cjs');
 
 
 async function startMediaServer() {
@@ -126,6 +127,39 @@ ipcMain.handle('reports:exportMatchReportExcel', async (event, projectId) => {
         console.error('Erro ao exportar para Excel:', error);
         return { success: false, message: `Erro: ${error.message}` };
     }
+});
+
+ipcMain.handle('video:exportPlaylist', async (event, payload) => {
+    const { projectId, videoPath, clips } = payload || {};
+
+    if (!videoPath) {
+        throw new Error('videoPath não informado.');
+    }
+    if (!clips || clips.length === 0) {
+        throw new Error('Nenhum clipe informado.');
+    }
+
+    const senderWindow = BrowserWindow.fromWebContents(event.sender);
+
+    const { filePath } = await dialog.showSaveDialog(senderWindow, {
+        title: 'Salvar playlist de vídeo',
+        defaultPath: `playlist-projeto-${projectId || 'playlist'}.mp4`,
+        filters: [{ name: 'Vídeo MP4', extensions: ['mp4'] }],
+    });
+
+    if (!filePath) {
+        return null;
+    }
+
+    await exportPlaylist(videoPath, clips, filePath);
+
+    return filePath;
+});
+
+ipcMain.handle('shell:openPath', async (event, filePath) => {
+    if (!filePath) return;
+    const { shell } = require('electron');
+    await shell.openPath(filePath);
 });
 
 

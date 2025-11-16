@@ -28,13 +28,16 @@ function getByProjectId(projectId) {
             p.photo as playerPhoto,
             c.name as categoryName,
             c.color as categoryColor,
-            res.name as resultadoName
+            res.name as resultadoName,
+            zon.name as zonaName
         FROM
             player_actions pa
         JOIN
             players p ON pa.player_id = p.id
         JOIN
             subcategories res ON pa.resultado_id = res.id
+        JOIN
+            subcategories zon ON pa.zona_id = zon.id
         JOIN
             categories c ON res.category_id = c.id
         WHERE
@@ -49,6 +52,8 @@ function getByProjectId(projectId) {
         playerNumber: row.playerNumber,
         playerPhoto: row.playerPhoto,
         actionDescription: `${row.categoryName}  ${row.resultadoName}`,
+        resultadoName: row.resultadoName,
+        zonaName: row.zonaName,
         categoryName: row.categoryName,
         categoryColor: row.categoryColor,
         clipStart: row.clip_start,
