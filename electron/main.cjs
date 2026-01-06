@@ -164,12 +164,16 @@ ipcMain.handle('shell:openPath', async (event, filePath) => {
 
 
 // ------------------ Inicialização ------------------
+let isAppInitialized = false;
+
 app.whenReady().then(async () => {
     await startMediaServer();
 
     const dbPath = path.join(app.getPath('userData'), 'volley-track.sqlite');
     initDatabase(dbPath);
+
     createWindow();
+    isAppInitialized = true;
 });
 
 app.on('window-all-closed', () => {
@@ -177,5 +181,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (app.isReady() && isAppInitialized && BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+    }
 });
